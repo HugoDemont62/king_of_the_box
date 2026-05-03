@@ -8,18 +8,20 @@ public sealed class KobPlayer : Component
     [Property] public float JumpForce { get; set; } = 300f;
     [Property] public GameObject CameraTarget { get; set; }
 
+    [Sync] public KobTeam Team { get; set; } = KobTeam.None;
+
     protected override void OnUpdate()
     {
         if ( IsProxy ) return;
-
         HandleMovement();
         HandleCamera();
     }
 
     void HandleMovement()
     {
-        var inputDir = Input.AnalogMove;
+        if ( Team == KobTeam.None ) return;
 
+        var inputDir = Input.AnalogMove;
         var dir = Scene.Camera.WorldRotation * new Vector3( inputDir.x, inputDir.y, 0 );
         dir = dir.WithZ( 0 ).Normal;
 
@@ -27,14 +29,10 @@ public sealed class KobPlayer : Component
         Controller.ApplyFriction( 5f );
 
         if ( Controller.IsOnGround && Input.Pressed( "Jump" ) )
-        {
             Controller.Punch( Vector3.Up * JumpForce );
-        }
 
         if ( !Controller.IsOnGround )
-        {
             Controller.Velocity += Vector3.Down * 800f * Time.Delta;
-        }
 
         Controller.Move();
     }
@@ -42,7 +40,6 @@ public sealed class KobPlayer : Component
     void HandleCamera()
     {
         if ( CameraTarget is null ) return;
-
         Scene.Camera.WorldPosition = CameraTarget.WorldPosition;
         Scene.Camera.WorldRotation = Rotation.From(
             Scene.Camera.WorldRotation.Pitch(),

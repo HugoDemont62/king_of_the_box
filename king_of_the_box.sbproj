@@ -1,7 +1,7 @@
 {
   "Title": "King of the box",
   "Type": "game",
-  "Org": "local",
+  "Org": "huggu",
   "Ident": "king_of_the_box",
   "Schema": 1,
   "IncludeSourceFiles": false,
