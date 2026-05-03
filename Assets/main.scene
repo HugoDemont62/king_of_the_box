@@ -494,8 +494,90 @@
           "Static": false,
           "Surface": null,
           "SurfaceVelocity": "0,0,0"
+        },
+        {
+          "__type": "KobZoneMover",
+          "__guid": "139a7ce7-3833-4511-8001-5483c41a7764",
+          "__enabled": true,
+          "Flags": 0,
+          "MoveInterval": 60,
+          "MoveSpeed": 50,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Waypoints": [
+            {
+              "_type": "gameobject",
+              "go": "f2caa2d7-f5a2-4ebc-a4d4-857671560ee4"
+            },
+            {
+              "_type": "gameobject",
+              "go": "c02d903b-4ca4-48f2-81b1-f2bd58c63062"
+            },
+            {
+              "_type": "gameobject",
+              "go": "19f9c8c2-450d-40b3-b104-33ab88a82e8a"
+            }
+          ]
         }
       ],
+      "Children": []
+    },
+    {
+      "__guid": "f2caa2d7-f5a2-4ebc-a4d4-857671560ee4",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waypoints1",
+      "Position": "481.342316,-1.58474731,23.2334595",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "c02d903b-4ca4-48f2-81b1-f2bd58c63062",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waypoints2",
+      "Position": "-176.596863,-1.58474731,23.2334595",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "19f9c8c2-450d-40b3-b104-33ab88a82e8a",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waypoints3",
+      "Position": "44.4405594,-1.58474731,23.2334595",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
       "Children": []
     }
   ],

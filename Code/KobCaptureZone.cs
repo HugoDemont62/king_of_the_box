@@ -5,16 +5,44 @@ public sealed class KobCaptureZone : Component
 	[Property] public int   PointsPerSecond { get; set; } = 1;
 	[Property] public float CaptureRadius   { get; set; } = 150f;
 
-	[Sync] public KobTeam ControllingTeam  { get; set; } = KobTeam.None;
-	[Sync] public float   CaptureProgress  { get; set; } = 0f;
-	[Sync] public bool    IsContested      { get; set; } = false;
+	[Sync] public KobTeam ControllingTeam { get; set; } = KobTeam.None;
+	[Sync] public float   CaptureProgress { get; set; } = 0f;
+	[Sync] public bool    IsContested     { get; set; } = false;
 
 	private float         _pointTimer;
-	private ModelRenderer _renderer;
+	private ModelRenderer _disc;
 
 	protected override void OnStart()
 	{
-		_renderer = GetComponent<ModelRenderer>();
+		// Créer le disque visuel comme enfant
+		var go = new GameObject( true, "ZoneDisc" );
+		go.Parent = GameObject;
+		go.LocalPosition = Vector3.Zero;
+		go.LocalRotation = Rotation.FromPitch( 90 );
+
+		_disc = go.Components.Create<ModelRenderer>();
+		_disc.Model = Model.Load( "models/dev/plane.vmdl" );
+
+		float scale = CaptureRadius / 50f;
+		go.LocalScale = new Vector3( scale, scale, 1f );
+	}
+
+	protected override void OnUpdate()
+	{
+		if ( _disc is null ) return;
+
+		// Pulsation douce
+		float pulse = 0.7f + MathF.Sin( Time.Now * 2.5f ) * 0.15f;
+
+		_disc.Tint = ControllingTeam switch
+		{
+			KobTeam.Red   => new Color( 0.9f, 0.2f, 0.2f, pulse ),
+			KobTeam.Blue  => new Color( 0.2f, 0.4f, 0.9f, pulse ),
+			KobTeam.Green => new Color( 0.2f, 0.85f, 0.2f, pulse ),
+			_             => IsContested
+				? new Color( 0.9f, 0.85f, 0.1f, pulse )
+				: new Color( 0.8f, 0.8f, 0.8f, pulse * 0.6f ),
+		};
 	}
 
 	protected override void OnFixedUpdate()
@@ -37,11 +65,9 @@ public sealed class KobCaptureZone : Component
 			? ( red > 0 ? KobTeam.Red : blue > 0 ? KobTeam.Blue : KobTeam.Green )
 			: KobTeam.None;
 
-		UpdateVisuals();
-
 		if ( IsContested || ControllingTeam == KobTeam.None )
 		{
-			_pointTimer    = 0f;
+			_pointTimer     = 0f;
 			CaptureProgress = 0f;
 			return;
 		}
@@ -56,18 +82,5 @@ public sealed class KobCaptureZone : Component
 			CaptureProgress  = 0f;
 			KobManager.Instance?.AddPoint( ControllingTeam );
 		}
-	}
-
-	void UpdateVisuals()
-	{
-		if ( _renderer is null ) return;
-
-		_renderer.Tint = ControllingTeam switch
-		{
-			KobTeam.Red   => new Color( 0.8f, 0.2f, 0.2f ),
-			KobTeam.Blue  => new Color( 0.2f, 0.2f, 0.8f ),
-			KobTeam.Green => new Color( 0.2f, 0.8f, 0.2f ),
-			_             => IsContested ? new Color( 0.8f, 0.8f, 0.2f ) : Color.White
-		};
 	}
 }
