@@ -1,1 +1,79 @@
-/* */
+/* ScoreLine Component Styles */
+
+.score-row {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 16px;
+	background-color: rgba(255, 255, 255, 0.05);
+	border-radius: 12px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	transition: all 0.25s ease;
+}
+
+.score-row:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.2);
+	transform: translateX(4px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.score-bar-bg {
+	width: 100%;
+	height: 16px;
+	background-color: rgba(255,255,255,0.08);
+	border-radius: 8px;
+	overflow: hidden;
+	border: 1px solid rgba(255,255,255,0.15);
+}
+
+.score-bar-fill {
+	height: 100%;
+	border-radius: 8px;
+	min-width: 6px;
+	transition: width 0.4s ease;
+	box-shadow: 0 0 12px rgba(255,255,255,0.4);
+}
+
+.score-info {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+}
+
+.score-team-name {
+	font-size: 22px;
+	font-weight: 900;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	min-width: 80px;
+}
+
+.score-value {
+	font-size: 32px;
+	font-weight: 900;
+	color: #ffffff;
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.score-max {
+	font-size: 18px;
+	color: rgba(255,255,255,0.6);
+	font-weight: 700;
+}
+
+.score-players {
+	font-size: 14px;
+	color: rgba(255, 255, 255, 0.85);
+	font-weight: 700;
+	text-align: right;
+	background-color: rgba(255, 255, 255, 0.1);
+	padding: 4px 10px;
+	border-radius: 8px;
+	white-space: nowrap;
+}

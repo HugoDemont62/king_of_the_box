@@ -142,6 +142,14 @@
             },
             "Property": "Position",
             "Value": "0,0,100"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c6ac1920-7678-4c9f-a6e5-83632633cd7b"
+            },
+            "Property": "SprintSpeedMultiplier",
+            "Value": 1.5
           }
         ],
         "MovedObjects": []
@@ -500,7 +508,7 @@
           "__guid": "139a7ce7-3833-4511-8001-5483c41a7764",
           "__enabled": true,
           "Flags": 0,
-          "MoveInterval": 60,
+          "MoveInterval": 1,
           "MoveSpeed": 50,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,

@@ -1,5 +1,6 @@
 using Sandbox;
 using System.Collections.Generic;
+using System.Linq;
 
 public sealed class KobManager : Component, Component.INetworkListener
 {
@@ -11,6 +12,10 @@ public sealed class KobManager : Component, Component.INetworkListener
 	[Sync] public int ScoreRed   { get; set; }
 	[Sync] public int ScoreBlue  { get; set; }
 	[Sync] public int ScoreGreen { get; set; }
+
+	[Sync] public int PlayersRed { get; set; }
+	[Sync] public int PlayersBlue { get; set; }
+	[Sync] public int PlayersGreen { get; set; }
 
 	private readonly Dictionary<ulong, GameObject> _players = new();
 
@@ -26,6 +31,9 @@ public sealed class KobManager : Component, Component.INetworkListener
 		var player = PlayerPrefab.Clone( WorldPosition );
 		player.NetworkSpawn( conn );
 		_players[conn.SteamId] = player;
+
+		// Broadcast l'arrivée du joueur
+		OnPlayerSpawned( conn.DisplayName );
 	}
 
 	void INetworkListener.OnDisconnected( Connection conn )
@@ -33,6 +41,20 @@ public sealed class KobManager : Component, Component.INetworkListener
 		if ( !_players.TryGetValue( conn.SteamId, out var player ) ) return;
 		player.Destroy();
 		_players.Remove( conn.SteamId );
+	}
+
+	protected override void OnUpdate()
+	{
+		if ( IsProxy ) return;
+		UpdatePlayerCounts();
+	}
+
+	private void UpdatePlayerCounts()
+	{
+		var allPlayers = Scene.GetAllComponents<KobPlayer>();
+		PlayersRed = allPlayers.Count( p => p.Team == KobTeam.Red );
+		PlayersBlue = allPlayers.Count( p => p.Team == KobTeam.Blue );
+		PlayersGreen = allPlayers.Count( p => p.Team == KobTeam.Green );
 	}
 
 	public void AddPoint( KobTeam team )
@@ -52,8 +74,14 @@ public sealed class KobManager : Component, Component.INetworkListener
 	}
 
 	[Rpc.Broadcast]
+	void OnPlayerSpawned( string playerName )
+	{
+		Log.Info( $"⚔️ {playerName} a rejoint le jeu!" );
+	}
+
+	[Rpc.Broadcast]
 	void EndGame( KobTeam winner )
 	{
-		Log.Info( $"Game over! {winner} wins!" );
+		Log.Info( $"🏆 Game over! {winner} team wins! 🏆" );
 	}
 }

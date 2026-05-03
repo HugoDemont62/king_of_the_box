@@ -7,30 +7,53 @@
 	{
 		<div class="team-select-overlay">
 			<div class="team-select-box">
-				<label class="team-select-title">CHOISIS TON EQUIPE</label>
+				<label class="team-select-title">⚔️ SÉLECTIONNE TON ÉQUIPE ⚔️</label>
+				<div class="team-select-subtitle">Appuie sur 1, 2 ou 3 - Ou clique un bouton!</div>
+
 				<div class="team-select-buttons">
-					<button class="team-btn team-red"   onclick=@(() => SelectTeam( KobTeam.Red ))>ROUGE</button>
-					<button class="team-btn team-blue"  onclick=@(() => SelectTeam( KobTeam.Blue ))>BLEUE</button>
-					<button class="team-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>VERTE</button>
+					<button class="team-btn team-red" onclick=@(() => SelectTeam( KobTeam.Red ))>
+						<div class="team-btn-content">
+							<span class="team-btn-name">🔴 ROUGE</span>
+							<span class="team-btn-count">@(Manager?.PlayersRed ?? 0) joueurs</span>
+						</div>
+					</button>
+					<button class="team-btn team-blue" onclick=@(() => SelectTeam( KobTeam.Blue ))>
+						<div class="team-btn-content">
+							<span class="team-btn-name">🔵 BLEUE</span>
+							<span class="team-btn-count">@(Manager?.PlayersBlue ?? 0) joueurs</span>
+						</div>
+					</button>
+					<button class="team-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>
+						<div class="team-btn-content">
+							<span class="team-btn-name">🟢 VERTE</span>
+							<span class="team-btn-count">@(Manager?.PlayersGreen ?? 0) joueurs</span>
+						</div>
+					</button>
+				</div>
+
+				<div class="team-select-tips">
+					💡 Conseil: Rejoins l'équipe avec le moins de joueurs!
 				</div>
 			</div>
 		</div>
 	}
 	else if ( LocalPlayer != null )
 	{
-		<div class="hud-team-bar">
-			<div class="hud-team-pill" style="border-color: @GetTeamColor();">
-				<label class="hud-team-label" style="color: @GetTeamColor();">@GetTeamLabel()</label>
-			</div>
-		</div>
+		<div class="hud-team-frame" style="border-color: @GetTeamColor();"></div>
 	}
 
 	@if ( Manager != null )
 	{
-		<div class="scoreboard">
-			<ScoreLine Team="Rouge" Color="#ff4444" Score=@Manager.ScoreRed  Max=@Manager.ScoreToWin />
-			<ScoreLine Team="Bleue" Color="#4488ff" Score=@Manager.ScoreBlue Max=@Manager.ScoreToWin />
-			<ScoreLine Team="Verte" Color="#44cc44" Score=@Manager.ScoreGreen Max=@Manager.ScoreToWin />
+		<div class="arma-scoreboard">
+			<div class="arma-score-box team-red-bg">
+				<span class="arma-score-value">@Manager.ScoreRed</span>
+			</div>
+			<div class="arma-score-box team-blue-bg">
+				<span class="arma-score-value">@Manager.ScoreBlue</span>
+			</div>
+			<div class="arma-score-box team-green-bg">
+				<span class="arma-score-value">@Manager.ScoreGreen</span>
+			</div>
 		</div>
 	}
 </root>
@@ -47,14 +70,6 @@
 		selector?.ChooseTeam( team );
 	}
 
-	string GetTeamLabel() => (LocalPlayer?.Team ?? KobTeam.None) switch
-	{
-		KobTeam.Red   => "EQUIPE ROUGE",
-		KobTeam.Blue  => "EQUIPE BLEUE",
-		KobTeam.Green => "EQUIPE VERTE",
-		_             => "",
-	};
-
 	string GetTeamColor() => (LocalPlayer?.Team ?? KobTeam.None) switch
 	{
 		KobTeam.Red   => "#ff4444",
@@ -65,5 +80,6 @@
 
 	protected override int BuildHash() =>
 		System.HashCode.Combine( LocalPlayer?.Team, LocalPlayer is not null,
-			Manager?.ScoreRed, Manager?.ScoreBlue, Manager?.ScoreGreen );
+			Manager?.ScoreRed, Manager?.ScoreBlue, Manager?.ScoreGreen,
+			Manager?.PlayersRed, Manager?.PlayersBlue, Manager?.PlayersGreen );
 }

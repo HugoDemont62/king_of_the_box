@@ -2,20 +2,38 @@
 @using Sandbox.UI
 @inherits PanelComponent
 
-<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: black;">
-	<label style="color: white; font-size: 48px; position: absolute; top: 40%; left: 40%;">CHOISIR EQUIPE</label>
-	<button style="position: absolute; top: 55%; left: 40%; background-color: red; color: white; font-size: 24px; padding: 10px 30px;"
-	        onclick=@(() => SelectTeam( KobTeam.Red ))>ROUGE</button>
-	<button style="position: absolute; top: 65%; left: 40%; background-color: blue; color: white; font-size: 24px; padding: 10px 30px;"
-	        onclick=@(() => SelectTeam( KobTeam.Blue ))>BLEUE</button>
-	<button style="position: absolute; top: 75%; left: 40%; background-color: green; color: white; font-size: 24px; padding: 10px 30px;"
-	        onclick=@(() => SelectTeam( KobTeam.Green ))>VERTE</button>
+<div class="team-panel-container">
+	<div class="team-panel-content">
+		<h1 class="team-panel-title">SÉLECTIONNE TON ÉQUIPE</h1>
+		<div class="team-panel-buttons">
+			<button class="team-panel-btn team-red" onclick=@(() => SelectTeam( KobTeam.Red ))>
+				<span class="team-btn-icon">🔴</span>
+				<span class="team-btn-text">ROUGE</span>
+				<span class="team-btn-count">@(Manager?.PlayersRed ?? 0) joueurs</span>
+			</button>
+			<button class="team-panel-btn team-blue" onclick=@(() => SelectTeam( KobTeam.Blue ))>
+				<span class="team-btn-icon">🔵</span>
+				<span class="team-btn-text">BLEUE</span>
+				<span class="team-btn-count">@(Manager?.PlayersBlue ?? 0) joueurs</span>
+			</button>
+			<button class="team-panel-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>
+				<span class="team-btn-icon">🟢</span>
+				<span class="team-btn-text">VERTE</span>
+				<span class="team-btn-count">@(Manager?.PlayersGreen ?? 0) joueurs</span>
+			</button>
+		</div>
+	</div>
 </div>
 
 @code {
+	KobManager Manager => KobManager.Instance;
+
 	void SelectTeam( KobTeam team )
 	{
 		var selector = Scene.GetAllComponents<KobTeamSelector>().FirstOrDefault();
 		selector?.ChooseTeam( team );
 	}
+
+	protected override int BuildHash() =>
+		System.HashCode.Combine( Manager?.PlayersRed, Manager?.PlayersBlue, Manager?.PlayersGreen );
 }
