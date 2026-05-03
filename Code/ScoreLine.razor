@@ -1,0 +1,30 @@
+@using Sandbox
+@using Sandbox.UI
+
+<root>
+	<div class="score-row">
+		<div class="score-bar-bg">
+			<div class="score-bar-fill" style="width: @BarWidth(); background-color: @Color;"></div>
+		</div>
+		<div class="score-info">
+			<label class="score-team-name" style="color: @Color;">@Team</label>
+			<label class="score-value">@Score <label class="score-max">/ @Max</label></label>
+		</div>
+	</div>
+</root>
+
+@code {
+	[Property] public string Team  { get; set; } = "";
+	[Property] public string Color { get; set; } = "white";
+	[Property] public int    Score { get; set; } = 0;
+	[Property] public int    Max   { get; set; } = 200;
+
+	string BarWidth()
+	{
+		if ( Max <= 0 ) return "0%";
+		float pct = System.Math.Clamp( (float)Score / Max, 0f, 1f ) * 100f;
+		return $"{pct:F1}%";
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine( Score, Max );
+}

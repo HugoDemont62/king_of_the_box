@@ -2,6 +2,68 @@
 @using Sandbox.UI
 @inherits PanelComponent
 
-<div style="position: absolute; top: 0; left: 0; width: 400px; height: 150px; background-color: red;">
-	<label style="color: white; font-size: 32px;">HUD VISIBLE</label>
-</div>
+<root>
+	@if ( NeedsTeam() )
+	{
+		<div class="team-select-overlay">
+			<div class="team-select-box">
+				<label class="team-select-title">CHOISIS TON EQUIPE</label>
+				<div class="team-select-buttons">
+					<button class="team-btn team-red"   onclick=@(() => SelectTeam( KobTeam.Red ))>ROUGE</button>
+					<button class="team-btn team-blue"  onclick=@(() => SelectTeam( KobTeam.Blue ))>BLEUE</button>
+					<button class="team-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>VERTE</button>
+				</div>
+			</div>
+		</div>
+	}
+	else if ( LocalPlayer != null )
+	{
+		<div class="hud-team-bar">
+			<div class="hud-team-pill" style="border-color: @GetTeamColor();">
+				<label class="hud-team-label" style="color: @GetTeamColor();">@GetTeamLabel()</label>
+			</div>
+		</div>
+	}
+
+	@if ( Manager != null )
+	{
+		<div class="scoreboard">
+			<ScoreLine Team="Rouge" Color="#ff4444" Score=@Manager.ScoreRed  Max=@Manager.ScoreToWin />
+			<ScoreLine Team="Bleue" Color="#4488ff" Score=@Manager.ScoreBlue Max=@Manager.ScoreToWin />
+			<ScoreLine Team="Verte" Color="#44cc44" Score=@Manager.ScoreGreen Max=@Manager.ScoreToWin />
+		</div>
+	}
+</root>
+
+@code {
+	KobPlayer  LocalPlayer => Scene.GetAllComponents<KobPlayer>().FirstOrDefault( p => !p.IsProxy );
+	KobManager Manager     => KobManager.Instance;
+
+	bool NeedsTeam() => LocalPlayer != null && LocalPlayer.Team == KobTeam.None;
+
+	void SelectTeam( KobTeam team )
+	{
+		var selector = Scene.GetAllComponents<KobTeamSelector>().FirstOrDefault( s => !s.IsProxy );
+		selector?.ChooseTeam( team );
+	}
+
+	string GetTeamLabel() => (LocalPlayer?.Team ?? KobTeam.None) switch
+	{
+		KobTeam.Red   => "EQUIPE ROUGE",
+		KobTeam.Blue  => "EQUIPE BLEUE",
+		KobTeam.Green => "EQUIPE VERTE",
+		_             => "",
+	};
+
+	string GetTeamColor() => (LocalPlayer?.Team ?? KobTeam.None) switch
+	{
+		KobTeam.Red   => "#ff4444",
+		KobTeam.Blue  => "#4488ff",
+		KobTeam.Green => "#44cc44",
+		_             => "white",
+	};
+
+	protected override int BuildHash() =>
+		System.HashCode.Combine( LocalPlayer?.Team, LocalPlayer is not null,
+			Manager?.ScoreRed, Manager?.ScoreBlue, Manager?.ScoreGreen );
+}
