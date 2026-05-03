@@ -1,0 +1,31 @@
+@using Sandbox
+@using Sandbox.UI
+
+<root>
+	<div class="zone-ring" style="border-color: @RingColor; background-color: @FillColor;"></div>
+</root>
+
+@code {
+	KobCaptureZone Zone => GameObject?.Parent?.Components.Get<KobCaptureZone>();
+
+	string RingColor => (Zone?.ControllingTeam ?? KobTeam.None) switch
+	{
+		KobTeam.Red   => "rgba(220,50,50,0.9)",
+		KobTeam.Blue  => "rgba(50,100,220,0.9)",
+		KobTeam.Green => "rgba(50,200,50,0.9)",
+		_             => (Zone?.IsContested ?? false)
+			? "rgba(255,200,0,0.9)"
+			: "rgba(200,200,200,0.6)",
+	};
+
+	string FillColor => (Zone?.ControllingTeam ?? KobTeam.None) switch
+	{
+		KobTeam.Red   => "rgba(220,50,50,0.10)",
+		KobTeam.Blue  => "rgba(50,100,220,0.10)",
+		KobTeam.Green => "rgba(50,200,50,0.10)",
+		_             => (Zone?.IsContested ?? false) ? "rgba(255,200,0,0.10)" : "rgba(200,200,200,0.04)",
+	};
+
+	protected override int BuildHash() =>
+		System.HashCode.Combine( Zone?.ControllingTeam, Zone?.IsContested );
+}

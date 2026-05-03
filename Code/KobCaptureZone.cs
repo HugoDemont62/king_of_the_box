@@ -1,4 +1,5 @@
 using Sandbox;
+using System.Linq;
 
 public sealed class KobCaptureZone : Component
 {
@@ -14,25 +15,37 @@ public sealed class KobCaptureZone : Component
 
 	protected override void OnStart()
 	{
-		// Créer le disque visuel comme enfant
 		var go = new GameObject( true, "ZoneDisc" );
 		go.Parent = GameObject;
 		go.LocalPosition = Vector3.Zero;
-		go.LocalRotation = Rotation.FromPitch( 90 );
+		go.LocalRotation = Rotation.Identity;
 
 		_disc = go.Components.Create<ModelRenderer>();
 		_disc.Model = Model.Load( "models/dev/plane.vmdl" );
 
 		float scale = CaptureRadius / 50f;
 		go.LocalScale = new Vector3( scale, scale, 1f );
+
+		// Crée automatiquement l'indicateur de zone (si absent)
+		if ( GameObject != null )
+		{
+			var existing = GameObject.Children.FirstOrDefault( c => c.Name == "ZoneIndicator" );
+			if ( existing == null )
+			{
+				var ind = new GameObject( true, "ZoneIndicator" );
+				ind.Parent = GameObject;
+				ind.LocalPosition = Vector3.Zero;
+				ind.LocalRotation = Rotation.Identity;
+				ind.LocalScale = Vector3.One;
+			}
+		}
 	}
 
 	protected override void OnUpdate()
 	{
 		if ( _disc is null ) return;
 
-		// Pulsation douce
-		float pulse = 0.7f + MathF.Sin( Time.Now * 2.5f ) * 0.15f;
+		float pulse = 0.7f + System.MathF.Sin( Time.Now * 2.5f ) * 0.15f;
 
 		_disc.Tint = ControllingTeam switch
 		{
