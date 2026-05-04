@@ -2,38 +2,47 @@
 @using Sandbox.UI
 @inherits PanelComponent
 
-<div class="team-panel-container">
-	<div class="team-panel-content">
-		<h1 class="team-panel-title">SÉLECTIONNE TON ÉQUIPE</h1>
-		<div class="team-panel-buttons">
-			<button class="team-panel-btn team-red" onclick=@(() => SelectTeam( KobTeam.Red ))>
-				<span class="team-btn-icon">🔴</span>
-				<span class="team-btn-text">ROUGE</span>
-				<span class="team-btn-count">@(Manager?.PlayersRed ?? 0) joueurs</span>
-			</button>
-			<button class="team-panel-btn team-blue" onclick=@(() => SelectTeam( KobTeam.Blue ))>
-				<span class="team-btn-icon">🔵</span>
-				<span class="team-btn-text">BLEUE</span>
-				<span class="team-btn-count">@(Manager?.PlayersBlue ?? 0) joueurs</span>
-			</button>
-			<button class="team-panel-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>
-				<span class="team-btn-icon">🟢</span>
-				<span class="team-btn-text">VERTE</span>
-				<span class="team-btn-count">@(Manager?.PlayersGreen ?? 0) joueurs</span>
-			</button>
+<root>
+	@if ( NeedsTeam() )
+	{
+		<div class="team-panel-container">
+			<div class="team-panel-content">
+				<h1 class="team-panel-title">SÉLECTIONNE TON ÉQUIPE</h1>
+				<div class="team-panel-buttons">
+					<button class="team-panel-btn team-red" onclick=@(() => SelectTeam( KobTeam.Red ))>
+						<span class="team-btn-icon">🔴</span>
+						<span class="team-btn-text">ROUGE</span>
+						<span class="team-btn-count">@(Manager?.PlayersRed ?? 0) joueurs</span>
+					</button>
+					<button class="team-panel-btn team-blue" onclick=@(() => SelectTeam( KobTeam.Blue ))>
+						<span class="team-btn-icon">🔵</span>
+						<span class="team-btn-text">BLEUE</span>
+						<span class="team-btn-count">@(Manager?.PlayersBlue ?? 0) joueurs</span>
+					</button>
+					<button class="team-panel-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>
+						<span class="team-btn-icon">🟢</span>
+						<span class="team-btn-text">VERTE</span>
+						<span class="team-btn-count">@(Manager?.PlayersGreen ?? 0) joueurs</span>
+					</button>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
+	}
+</root>
 
 @code {
 	KobManager Manager => KobManager.Instance;
 
+	bool NeedsTeam() => !Scene.GetAllComponents<KobPlayer>().Any( p => !p.IsProxy );
+
 	void SelectTeam( KobTeam team )
 	{
-		var selector = Scene.GetAllComponents<KobTeamSelector>().FirstOrDefault();
-		selector?.ChooseTeam( team );
+		Manager?.RequestSpawn( team );
 	}
 
 	protected override int BuildHash() =>
-		System.HashCode.Combine( Manager?.PlayersRed, Manager?.PlayersBlue, Manager?.PlayersGreen );
+		System.HashCode.Combine(
+			Manager?.PlayersRed, Manager?.PlayersBlue, Manager?.PlayersGreen,
+			NeedsTeam()
+		);
 }

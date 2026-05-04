@@ -1,43 +1,10 @@
 @using Sandbox
 @using Sandbox.UI
+@using System.Linq
 @inherits PanelComponent
 
 <root>
-	@if ( NeedsTeam() )
-	{
-		<div class="team-select-overlay">
-			<div class="team-select-box">
-				<label class="team-select-title">⚔️ SÉLECTIONNE TON ÉQUIPE ⚔️</label>
-				<div class="team-select-subtitle">Appuie sur 1, 2 ou 3 - Ou clique un bouton!</div>
-
-				<div class="team-select-buttons">
-					<button class="team-btn team-red" onclick=@(() => SelectTeam( KobTeam.Red ))>
-						<div class="team-btn-content">
-							<span class="team-btn-name">🔴 ROUGE</span>
-							<span class="team-btn-count">@(Manager?.PlayersRed ?? 0) joueurs</span>
-						</div>
-					</button>
-					<button class="team-btn team-blue" onclick=@(() => SelectTeam( KobTeam.Blue ))>
-						<div class="team-btn-content">
-							<span class="team-btn-name">🔵 BLEUE</span>
-							<span class="team-btn-count">@(Manager?.PlayersBlue ?? 0) joueurs</span>
-						</div>
-					</button>
-					<button class="team-btn team-green" onclick=@(() => SelectTeam( KobTeam.Green ))>
-						<div class="team-btn-content">
-							<span class="team-btn-name">🟢 VERTE</span>
-							<span class="team-btn-count">@(Manager?.PlayersGreen ?? 0) joueurs</span>
-						</div>
-					</button>
-				</div>
-
-				<div class="team-select-tips">
-					💡 Conseil: Rejoins l'équipe avec le moins de joueurs!
-				</div>
-			</div>
-		</div>
-	}
-	else if ( LocalPlayer != null )
+	@if ( LocalPlayer != null && LocalPlayer.Team != KobTeam.None )
 	{
 		<div class="hud-team-frame" style="border-color: @GetTeamColor();"></div>
 	}
@@ -56,19 +23,64 @@
 			</div>
 		</div>
 	}
+
+	@if ( ShowScoreboard )
+	{
+		<div class="kob-scoreboard">
+			<div class="kob-sb-header">
+				<div class="kob-sb-title">KING OF THE BOX — SCORES</div>
+				<div class="kob-sb-team-scores">
+					@if ( Manager != null )
+					{
+						<span class="kob-sb-team-score" style="color: #ff4444;">🔴 @Manager.ScoreRed</span>
+						<span class="kob-sb-team-score" style="color: #4488ff;">🔵 @Manager.ScoreBlue</span>
+						<span class="kob-sb-team-score" style="color: #44cc44;">🟢 @Manager.ScoreGreen</span>
+					}
+				</div>
+			</div>
+			<div class="kob-sb-cols">
+				<span class="col-rank">#</span>
+				<span class="col-player">JOUEUR</span>
+				<span class="col-score">SCORE</span>
+				<span class="col-k">K</span>
+				<span class="col-d">D</span>
+				<span class="col-a">A</span>
+				<span class="col-kd">K/D</span>
+				<span class="col-ping">PING</span>
+			</div>
+			@for ( int i = 0; i < _sortedPlayers.Count; i++ )
+			{
+				var player  = _sortedPlayers[i];
+				var rank    = i + 1;
+				var isLocal = !player.IsProxy;
+				<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
+					<span class="col-rank @(rank == 1 ? "kob-sb-rank-gold" : "")">@("#" + rank)</span>
+					<span class="col-player">
+						<span class="team-badge" style="background-color: @TeamBadgeColor( player.Team );"></span>
+						<span style="color: @ScoreboardTeamColor( player.Team );">@player.PlayerName</span>
+					</span>
+					<span class="col-score">@TotalScore( player )</span>
+					<span class="col-k">@player.Kills</span>
+					<span class="col-d">@player.Deaths</span>
+					<span class="col-a">@player.Assists</span>
+					<span class="col-kd">@KdRatio( player )</span>
+					<span class="col-ping @PingClass( player.Ping )">@(player.Ping)ms</span>
+				</div>
+			}
+		</div>
+	}
 </root>
 
 @code {
 	KobPlayer  LocalPlayer => Scene.GetAllComponents<KobPlayer>().FirstOrDefault( p => !p.IsProxy );
 	KobManager Manager     => KobManager.Instance;
 
-	bool NeedsTeam() => LocalPlayer != null && LocalPlayer.Team == KobTeam.None;
+	bool ShowScoreboard { get; set; }
+	List<KobPlayer> _sortedPlayers = new();
 
-	void SelectTeam( KobTeam team )
-	{
-		var selector = Scene.GetAllComponents<KobTeamSelector>().FirstOrDefault( s => !s.IsProxy );
-		selector?.ChooseTeam( team );
-	}
+	int    TotalScore( KobPlayer p ) => p.Kills + p.Assists + p.ZonePoints;
+	string KdRatio( KobPlayer p )    => (p.Kills / (float)System.Math.Max( p.Deaths, 1 )).ToString( "F2" );
+	string PingClass( int ping )     => ping < 60 ? "ping-green" : ping < 120 ? "ping-orange" : "ping-red";
 
 	string GetTeamColor() => (LocalPlayer?.Team ?? KobTeam.None) switch
 	{
@@ -78,8 +90,62 @@
 		_             => "white",
 	};
 
-	protected override int BuildHash() =>
-		System.HashCode.Combine( LocalPlayer?.Team, LocalPlayer is not null,
-			Manager?.ScoreRed, Manager?.ScoreBlue, Manager?.ScoreGreen,
-			Manager?.PlayersRed, Manager?.PlayersBlue, Manager?.PlayersGreen );
+	string TeamBadgeColor( KobTeam team ) => team switch
+	{
+		KobTeam.Red   => "#ff4444",
+		KobTeam.Blue  => "#4488ff",
+		KobTeam.Green => "#44cc44",
+		_             => "#888888",
+	};
+
+	string ScoreboardTeamColor( KobTeam team ) => team switch
+	{
+		KobTeam.Red   => "#ff6666",
+		KobTeam.Blue  => "#6699ff",
+		KobTeam.Green => "#66dd66",
+		_             => "#cccccc",
+	};
+
+	protected override void OnUpdate()
+	{
+		var show = Input.Down( "score" );
+		if ( ShowScoreboard == show ) return;
+		ShowScoreboard = show;
+		StateHasChanged();
+	}
+
+	protected override int BuildHash()
+	{
+		var h = new System.HashCode();
+		h.Add( LocalPlayer?.Team );
+		h.Add( LocalPlayer is not null );
+		h.Add( Manager?.ScoreRed );
+		h.Add( Manager?.ScoreBlue );
+		h.Add( Manager?.ScoreGreen );
+		h.Add( Manager?.PlayersRed );
+		h.Add( Manager?.PlayersBlue );
+		h.Add( Manager?.PlayersGreen );
+
+		if ( ShowScoreboard )
+		{
+			_sortedPlayers = Scene.GetAllComponents<KobPlayer>()
+				.OrderByDescending( p => TotalScore( p ) )
+				.ThenByDescending( p => p.Kills )
+				.ToList();
+
+			foreach ( var p in _sortedPlayers )
+			{
+				h.Add( p.Kills );
+				h.Add( p.Deaths );
+				h.Add( p.Assists );
+				h.Add( p.ZonePoints );
+				h.Add( (int)p.TimePlayed );
+				h.Add( p.Ping );
+				h.Add( p.Team );
+				h.Add( p.PlayerName );
+			}
+		}
+
+		return h.ToHashCode();
+	}
 }

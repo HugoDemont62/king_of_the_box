@@ -13,8 +13,8 @@ public sealed class KobManager : Component, Component.INetworkListener
 	[Sync] public int ScoreBlue  { get; set; }
 	[Sync] public int ScoreGreen { get; set; }
 
-	[Sync] public int PlayersRed { get; set; }
-	[Sync] public int PlayersBlue { get; set; }
+	[Sync] public int PlayersRed   { get; set; }
+	[Sync] public int PlayersBlue  { get; set; }
 	[Sync] public int PlayersGreen { get; set; }
 
 	private readonly Dictionary<ulong, GameObject> _players = new();
@@ -26,14 +26,7 @@ public sealed class KobManager : Component, Component.INetworkListener
 
 	void INetworkListener.OnActive( Connection conn )
 	{
-		if ( !Networking.IsHost || PlayerPrefab is null ) return;
-
-		var player = PlayerPrefab.Clone( WorldPosition );
-		player.NetworkSpawn( conn );
-		_players[conn.SteamId] = player;
-
-		// Broadcast l'arrivée du joueur
-		OnPlayerSpawned( conn.DisplayName );
+		// Le joueur spawne uniquement après sélection d'équipe via RequestSpawn
 	}
 
 	void INetworkListener.OnDisconnected( Connection conn )
@@ -41,6 +34,31 @@ public sealed class KobManager : Component, Component.INetworkListener
 		if ( !_players.TryGetValue( conn.SteamId, out var player ) ) return;
 		player.Destroy();
 		_players.Remove( conn.SteamId );
+	}
+
+	[Rpc.Host]
+	public void RequestSpawn( KobTeam team )
+	{
+		if ( !Networking.IsHost || PlayerPrefab is null ) return;
+
+		var conn = Rpc.Caller;
+		if ( _players.ContainsKey( conn.SteamId ) ) return;
+
+		var spawnPoints = Scene.GetAllComponents<KobSpawnPoint>()
+			.Where( s => s.Team == team )
+			.ToList();
+
+		var spawnPos = spawnPoints.Count > 0
+			? Game.Random.FromList( spawnPoints ).WorldPosition
+			: WorldPosition;
+
+		var player = PlayerPrefab.Clone( spawnPos );
+		var kobPlayer = player.Components.Get<KobPlayer>();
+		if ( kobPlayer is not null )
+			kobPlayer.Team = team;
+
+		player.NetworkSpawn( conn );
+		_players[conn.SteamId] = player;
 	}
 
 	protected override void OnUpdate()
@@ -52,8 +70,8 @@ public sealed class KobManager : Component, Component.INetworkListener
 	private void UpdatePlayerCounts()
 	{
 		var allPlayers = Scene.GetAllComponents<KobPlayer>();
-		PlayersRed = allPlayers.Count( p => p.Team == KobTeam.Red );
-		PlayersBlue = allPlayers.Count( p => p.Team == KobTeam.Blue );
+		PlayersRed   = allPlayers.Count( p => p.Team == KobTeam.Red );
+		PlayersBlue  = allPlayers.Count( p => p.Team == KobTeam.Blue );
 		PlayersGreen = allPlayers.Count( p => p.Team == KobTeam.Green );
 	}
 
@@ -71,12 +89,6 @@ public sealed class KobManager : Component, Component.INetworkListener
 		if ( ScoreRed   >= ScoreToWin ) { EndGame( KobTeam.Red );   return; }
 		if ( ScoreBlue  >= ScoreToWin ) { EndGame( KobTeam.Blue );  return; }
 		if ( ScoreGreen >= ScoreToWin ) { EndGame( KobTeam.Green ); return; }
-	}
-
-	[Rpc.Broadcast]
-	void OnPlayerSpawned( string playerName )
-	{
-		Log.Info( $"⚔️ {playerName} a rejoint le jeu!" );
 	}
 
 	[Rpc.Broadcast]

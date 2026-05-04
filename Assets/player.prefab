@@ -16,6 +16,18 @@
     "OwnerTransfer": 1,
     "Components": [
       {
+        "__type": "Sandbox.KobHud",
+        "__guid": "a27894f0-3f15-409d-8685-247c39875ba8",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      },
+      {
         "__type": "Sandbox.PlayerController",
         "__guid": "fedc14c7-7cb6-42f7-95e6-a8d825988271",
         "__enabled": true,
@@ -197,7 +209,6 @@
         "__guid": "c6ac1920-7678-4c9f-a6e5-83632633cd7b",
         "__enabled": true,
         "Flags": 0,
-        "CameraTarget": null,
         "JumpForce": 300,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -205,6 +216,7 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
+        "SprintSpeedMultiplier": 1.5,
         "WalkSpeed": 200
       },
       {
@@ -226,18 +238,6 @@
         "Radius": 16,
         "StepHeight": 18,
         "UseCollisionRules": false
-      },
-      {
-        "__type": "KobTeamSelector",
-        "__guid": "c7ca616f-3419-40fa-9f86-92d9ab8cc893",
-        "__enabled": true,
-        "Flags": 0,
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null
       }
     ],
     "Children": [

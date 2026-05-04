@@ -94,6 +94,8 @@ public sealed class KobCaptureZone : Component
 			_pointTimer     -= interval;
 			CaptureProgress  = 0f;
 			KobManager.Instance?.AddPoint( ControllingTeam );
+			foreach ( var p in playersInZone.Where( p => p.Team == ControllingTeam ) )
+				p.ZonePoints++;
 		}
 	}
 }
