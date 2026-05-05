@@ -126,7 +126,7 @@
         {
           "__type": "Sandbox.KobHud",
           "__guid": "44ab0134-2255-4e24-8f58-adb5ec960263",
-          "__enabled": false,
+          "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -551,6 +551,11 @@
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
+        }
+      },
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
         }
       }
     }
