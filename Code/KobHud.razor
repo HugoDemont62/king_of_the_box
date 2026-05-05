@@ -1,5 +1,6 @@
 @using Sandbox
 @using Sandbox.UI
+@using System
 @using System.Linq
 @inherits PanelComponent
 
@@ -21,6 +22,53 @@
 			<div class="arma-score-box team-green-bg">
 				<span class="arma-score-value">@Manager.ScoreGreen</span>
 			</div>
+		</div>
+	}
+
+	@if ( LocalHealth != null && LocalPlayer?.Team != KobTeam.None && !LocalHealth.IsDead )
+	{
+		<div class="kob-combat-hud">
+			<div class="kob-stat-row">
+				<span class="kob-stat-label">❤</span>
+				<div class="kob-bar kob-health-bar">
+					<div class="kob-bar-fill kob-health-fill"
+					     style="width: @(LocalHealth.MaxHealth > 0 ? (int)(LocalHealth.Health / LocalHealth.MaxHealth * 100) : 0)%;"></div>
+				</div>
+				<span class="kob-stat-value">@((int)LocalHealth.Health)</span>
+			</div>
+			<div class="kob-stat-row">
+				<span class="kob-stat-label">🛡</span>
+				<div class="kob-bar kob-armor-bar">
+					<div class="kob-bar-fill kob-armor-fill"
+					     style="width: @(LocalHealth.MaxArmor > 0 ? (int)(LocalHealth.Armor / LocalHealth.MaxArmor * 100) : 0)%;"></div>
+				</div>
+				<span class="kob-stat-value">@((int)LocalHealth.Armor)</span>
+			</div>
+		</div>
+
+		@if ( ActiveWeapon != null )
+		{
+			<div class="kob-ammo-hud">
+				@if ( ActiveWeapon.IsReloading )
+				{
+					<span class="kob-reloading">RECHARGEMENT...</span>
+				}
+				else
+				{
+					<span class="kob-ammo-current">@ActiveWeapon.AmmoCurrent</span>
+					<span class="kob-ammo-sep"> / </span>
+					<span class="kob-ammo-max">@ActiveWeapon.AmmoMax</span>
+				}
+			</div>
+		}
+	}
+
+	@if ( LocalRespawn != null && LocalRespawn.IsDead )
+	{
+		<div class="kob-death-overlay">
+			<div class="kob-death-title">ÉLIMINÉ</div>
+			<div class="kob-death-killer">par <b>@(string.IsNullOrEmpty(LocalRespawn.KillerName) ? "l'environnement" : LocalRespawn.KillerName)</b></div>
+			<div class="kob-death-timer">Respawn dans @(MathF.Ceiling( LocalRespawn.RespawnTimer ))s</div>
 		</div>
 	}
 
@@ -72,17 +120,22 @@
 </root>
 
 @code {
-	KobPlayer  LocalPlayer => Scene.GetAllComponents<KobPlayer>().FirstOrDefault( p => !p.IsProxy );
-	KobManager Manager     => KobManager.Instance;
+	KobPlayer            LocalPlayer  => Scene.GetAllComponents<KobPlayer>().FirstOrDefault( p => !p.IsProxy );
+	KobManager           Manager      => KobManager.Instance;
+	KobHealth            LocalHealth  => LocalPlayer?.Components.Get<KobHealth>();
+	KobRespawnController LocalRespawn => LocalPlayer?.Components.Get<KobRespawnController>();
+	KobWeapon            ActiveWeapon => LocalPlayer?.Components.GetAll<KobWeapon>()
+	                                         .OrderBy( w => w.WeaponSlot )
+	                                         .ElementAtOrDefault( LocalPlayer.ActiveWeaponSlot );
 
 	bool ShowScoreboard { get; set; }
 	List<KobPlayer> _sortedPlayers = new();
 
 	int    TotalScore( KobPlayer p ) => p.Kills + p.Assists + p.ZonePoints;
-	string KdRatio( KobPlayer p )    => (p.Kills / (float)System.Math.Max( p.Deaths, 1 )).ToString( "F2" );
+	string KdRatio( KobPlayer p )    => ( p.Kills / (float)System.Math.Max( p.Deaths, 1 ) ).ToString( "F2" );
 	string PingClass( int ping )     => ping < 60 ? "ping-green" : ping < 120 ? "ping-orange" : "ping-red";
 
-	string GetTeamColor() => (LocalPlayer?.Team ?? KobTeam.None) switch
+	string GetTeamColor() => ( LocalPlayer?.Team ?? KobTeam.None ) switch
 	{
 		KobTeam.Red   => "#ff4444",
 		KobTeam.Blue  => "#4488ff",
@@ -116,15 +169,31 @@
 
 	protected override int BuildHash()
 	{
-		var h = new System.HashCode();
-		h.Add( LocalPlayer?.Team );
-		h.Add( LocalPlayer is not null );
+		var h       = new System.HashCode();
+		var player  = LocalPlayer;
+		var health  = player?.Components.Get<KobHealth>();
+		var respawn = player?.Components.Get<KobRespawnController>();
+		var weapon  = player?.Components.GetAll<KobWeapon>()
+		                    .OrderBy( w => w.WeaponSlot )
+		                    .ElementAtOrDefault( player.ActiveWeaponSlot );
+
+		h.Add( player?.Team );
+		h.Add( player is not null );
 		h.Add( Manager?.ScoreRed );
 		h.Add( Manager?.ScoreBlue );
 		h.Add( Manager?.ScoreGreen );
 		h.Add( Manager?.PlayersRed );
 		h.Add( Manager?.PlayersBlue );
 		h.Add( Manager?.PlayersGreen );
+		h.Add( health?.Health );
+		h.Add( health?.Armor );
+		h.Add( health?.IsDead );
+		h.Add( respawn?.IsDead );
+		h.Add( (int)MathF.Ceiling( respawn?.RespawnTimer ?? 0f ) );
+		h.Add( respawn?.KillerName );
+		h.Add( weapon?.AmmoCurrent );
+		h.Add( weapon?.IsReloading );
+		h.Add( player?.ActiveWeaponSlot );
 
 		if ( ShowScoreboard )
 		{

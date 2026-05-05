@@ -173,7 +173,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "SpawnPoints",
-      "Position": "0,0,100",
+      "Position": "-1382.39722,1,9.44338608",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -190,7 +190,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "SpawnPoint_Red",
-          "Position": "705.574768,-368.63681,0",
+          "Position": "-1.6496582,-368.63681,0",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "",
@@ -222,7 +222,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "SpawnPoint_Blue",
-          "Position": "705.574768,1773.39709,0",
+          "Position": "21.3493652,278.228394,0",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "",
@@ -284,92 +284,11 @@
       ]
     },
     {
-      "__guid": "538f7b33-b464-4c39-bc20-95baddd41fa7",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "Terrain",
-      "Position": "0,0,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.Terrain",
-          "__guid": "69626c66-a4f4-4594-a563-5fba4bfc6dc4",
-          "__enabled": true,
-          "Flags": 0,
-          "__version": 1,
-          "ClipMapLodExtentTexels": 256,
-          "ClipMapLodLevels": 6,
-          "ColliderFlags": 0,
-          "Elasticity": null,
-          "EnableCollision": true,
-          "Friction": null,
-          "IsTrigger": false,
-          "MaterialOverride": null,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnObjectTriggerEnter": null,
-          "OnObjectTriggerExit": null,
-          "OnTriggerEnter": null,
-          "OnTriggerExit": null,
-          "RenderType": "Off",
-          "RollingResistance": null,
-          "Static": true,
-          "Storage": "untitled.terrain",
-          "SubdivisionFactor": 1,
-          "SubdivisionLodCount": 3,
-          "Surface": null,
-          "SurfaceVelocity": "0,0,0",
-          "TerrainHeight": 10000,
-          "TerrainSize": 19968
-        },
-        {
-          "__type": "Sandbox.PlaneCollider",
-          "__guid": "f5391da5-838c-4e82-9ca1-8bdedb518f3e",
-          "__enabled": true,
-          "Flags": 0,
-          "Center": "0,0,0",
-          "ColliderFlags": 0,
-          "Elasticity": null,
-          "Friction": null,
-          "IsTrigger": false,
-          "Normal": "0,0,1",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnObjectTriggerEnter": null,
-          "OnObjectTriggerExit": null,
-          "OnTriggerEnter": null,
-          "OnTriggerExit": null,
-          "RollingResistance": null,
-          "Scale": "10000,10000",
-          "Static": true,
-          "Surface": null,
-          "SurfaceVelocity": "0,0,0"
-        }
-      ],
-      "Children": []
-    },
-    {
       "__guid": "12ab2f4b-c3d5-4dae-8f88-41d5e65d1536",
       "__version": 2,
       "Flags": 0,
       "Name": "CaptureZone",
-      "Position": "100,0,0",
+      "Position": "-1435.33215,0,27.4126625",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -475,7 +394,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Waypoints1",
-      "Position": "481.342316,-1.58474731,23.2334595",
+      "Position": "-1375.10193,391.335449,6.58118439",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -493,7 +412,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Waypoints2",
-      "Position": "-176.596863,-1.58474731,23.2334595",
+      "Position": "-1241.93799,-882.926758,5.43858337",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -511,7 +430,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Waypoints3",
-      "Position": "44.4405594,-1.58474731,23.2334595",
+      "Position": "-2251.91602,-16.6835136,4.24344683",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -522,6 +441,44 @@
       "NetworkTransmit": true,
       "OwnerTransfer": 1,
       "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "edf35739-fa71-4ba7-990a-b876ce420712",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Map",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.MapInstance",
+          "__guid": "f60336cc-ead3-4f60-ba50-4cb0a60b2b82",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "EnableCollision": true,
+          "MapName": "facepunch.flatgrass",
+          "NoOrigin": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnMapLoaded": null,
+          "OnMapUnloaded": null,
+          "UseMapFromLaunch": false
+        }
+      ],
       "Children": []
     }
   ],
@@ -545,17 +502,17 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
+        }
+      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
-        }
-      },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
         }
       }
     }

@@ -24,6 +24,11 @@ public sealed class KobManager : Component, Component.INetworkListener
 		Instance = this;
 	}
 
+	protected override void OnDestroy()
+	{
+		if ( Instance == this ) Instance = null;
+	}
+
 	void INetworkListener.OnActive( Connection conn )
 	{
 		// Le joueur spawne uniquement après sélection d'équipe via RequestSpawn
@@ -89,6 +94,25 @@ public sealed class KobManager : Component, Component.INetworkListener
 		if ( ScoreRed   >= ScoreToWin ) { EndGame( KobTeam.Red );   return; }
 		if ( ScoreBlue  >= ScoreToWin ) { EndGame( KobTeam.Blue );  return; }
 		if ( ScoreGreen >= ScoreToWin ) { EndGame( KobTeam.Green ); return; }
+	}
+
+	public void RespawnPlayer( KobPlayer player )
+	{
+		if ( IsProxy || player is null ) return;
+
+		var spawnPoints = Scene.GetAllComponents<KobSpawnPoint>()
+			.Where( s => s.Team == player.Team )
+			.ToList();
+
+		var spawnPos = spawnPoints.Count > 0
+			? Game.Random.FromList( spawnPoints ).WorldPosition
+			: WorldPosition;
+
+		player.WorldPosition = spawnPos;
+
+		player.Components.Get<KobHealth>()?.ResetHealth();
+		player.Components.Get<KobRespawnController>()?.OnRespawn();
+		player.ResetWeaponState();
 	}
 
 	[Rpc.Broadcast]
