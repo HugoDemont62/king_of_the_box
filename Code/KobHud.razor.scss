@@ -202,7 +202,7 @@ root {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background: rgba(0, 0, 0, 0.88);
+	background-color: rgba(0, 0, 0, 0.88);
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	min-width: 860px;
 	display: flex;
@@ -218,7 +218,7 @@ root {
 	gap: 10px;
 	padding: 22px 32px 16px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-	background: rgba(255, 255, 255, 0.03);
+	background-color: rgba(255, 255, 255, 0.03);
 }
 
 .kob-sb-title {
@@ -247,7 +247,7 @@ root {
 	flex-direction: row;
 	padding: 10px 20px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	background: rgba(255, 255, 255, 0.04);
+	background-color: rgba(255, 255, 255, 0.04);
 }
 
 .kob-sb-row {
@@ -258,13 +258,13 @@ root {
 }
 
 .kob-sb-row-local {
-	background: rgba(255, 255, 255, 0.08);
+	background-color: rgba(255, 255, 255, 0.08);
 	border-left: 4px solid rgba(255, 255, 255, 0.7);
 	padding-left: 16px;
 }
 
 .kob-sb-row-local .col-player {
-	background: rgba(255, 200, 0, 0.22);
+	background-color: rgba(255, 200, 0, 0.22);
 	border-radius: 3px;
 	padding: 2px 8px;
 }

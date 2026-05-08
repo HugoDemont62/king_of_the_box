@@ -24,7 +24,7 @@
           "Flags": 0,
           "BackgroundColor": "0.33333,0.46275,0.52157,1",
           "ClearFlags": "All",
-          "EnablePostProcessing": true,
+          "EnablePostProcessing": false,
           "FieldOfView": 60,
           "FovAxis": "Horizontal",
           "IsMainCamera": true,
@@ -444,11 +444,11 @@
       "Children": []
     },
     {
-      "__guid": "edf35739-fa71-4ba7-990a-b876ce420712",
+      "__guid": "c11119b5-a320-45db-8c6c-50131ed6e298",
       "__version": 2,
       "Flags": 0,
-      "Name": "Map",
-      "Position": "0,0,0",
+      "Name": "Terrain",
+      "Position": "-1893.35193,-2618.83472,0",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -460,23 +460,39 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sandbox.MapInstance",
-          "__guid": "f60336cc-ead3-4f60-ba50-4cb0a60b2b82",
+          "__type": "Sandbox.Terrain",
+          "__guid": "84a08e71-6a98-4045-b8d4-0dc50cf3a0fa",
           "__enabled": true,
           "Flags": 0,
           "__version": 1,
+          "ClipMapLodExtentTexels": 256,
+          "ClipMapLodLevels": 6,
+          "ColliderFlags": 0,
+          "Elasticity": null,
           "EnableCollision": true,
-          "MapName": "facepunch.flatgrass",
-          "NoOrigin": false,
+          "Friction": null,
+          "IsTrigger": false,
+          "MaterialOverride": null,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "OnMapLoaded": null,
-          "OnMapUnloaded": null,
-          "UseMapFromLaunch": false
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RenderType": "Off",
+          "RollingResistance": null,
+          "Static": true,
+          "Storage": "untitled.terrain",
+          "SubdivisionFactor": 1,
+          "SubdivisionLodCount": 3,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0",
+          "TerrainHeight": 10000,
+          "TerrainSize": 39936
         }
       ],
       "Children": []
@@ -502,6 +518,11 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
@@ -509,11 +530,6 @@
       },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
-      },
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
-        }
       }
     }
   },
