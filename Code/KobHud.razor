@@ -48,20 +48,24 @@
 
 		@if ( ActiveWeapon != null )
 		{
-			<div class="kob-ammo-hud">
-				@if ( ActiveWeapon.IsReloading )
-				{
-					<span class="kob-reloading">RECHARGEMENT...</span>
-				}
-				else
-				{
+			<div class="kob-weapon-panel">
+				<div class="kob-weapon-name">@ActiveWeapon.WeaponName</div>
+				<div class="kob-weapon-ammo-row">
 					<span class="kob-ammo-current">@ActiveWeapon.AmmoCurrent</span>
 					<span class="kob-ammo-sep"> / </span>
 					<span class="kob-ammo-max">@ActiveWeapon.AmmoMax</span>
+				</div>
+				@if ( ActiveWeapon.IsReloading )
+				{
+					<div class="kob-reload-bar-bg">
+						<div class="kob-reload-bar-fill" style="width: @ReloadPct(ActiveWeapon)%;"></div>
+					</div>
 				}
 			</div>
 		}
 	}
+
+	<div class="kob-crosshair">+</div>
 
 	@if ( LocalRespawn != null && LocalRespawn.IsDead )
 	{
@@ -124,12 +128,15 @@
 	KobManager           Manager      => KobManager.Instance;
 	KobHealth            LocalHealth  => LocalPlayer?.Components.Get<KobHealth>();
 	KobRespawnController LocalRespawn => LocalPlayer?.Components.Get<KobRespawnController>();
-	KobWeapon            ActiveWeapon => LocalPlayer?.Components.GetAll<KobWeapon>()
+	KobWeapon            ActiveWeapon => LocalPlayer?.Components.GetAll<KobWeapon>( FindMode.EverythingInSelfAndDescendants )
 	                                         .OrderBy( w => w.WeaponSlot )
 	                                         .ElementAtOrDefault( LocalPlayer.ActiveWeaponSlot );
 
 	bool ShowScoreboard { get; set; }
 	List<KobPlayer> _sortedPlayers = new();
+
+	int ReloadPct( KobWeapon w ) =>
+		(int)( MathF.Min( 1f, MathF.Max( 0f, ( Time.Now - w.ReloadStartTime ) / w.ReloadTime ) ) * 100f );
 
 	int    TotalScore( KobPlayer p ) => p.Kills + p.Assists + p.ZonePoints;
 	string KdRatio( KobPlayer p )    => ( p.Kills / (float)System.Math.Max( p.Deaths, 1 ) ).ToString( "F2" );
@@ -173,7 +180,7 @@
 		var player  = LocalPlayer;
 		var health  = player?.Components.Get<KobHealth>();
 		var respawn = player?.Components.Get<KobRespawnController>();
-		var weapon  = player?.Components.GetAll<KobWeapon>()
+		var weapon  = player?.Components.GetAll<KobWeapon>( FindMode.EverythingInSelfAndDescendants )
 		                    .OrderBy( w => w.WeaponSlot )
 		                    .ElementAtOrDefault( player.ActiveWeaponSlot );
 
@@ -193,6 +200,8 @@
 		h.Add( respawn?.KillerName );
 		h.Add( weapon?.AmmoCurrent );
 		h.Add( weapon?.IsReloading );
+		h.Add( weapon?.WeaponName );
+		h.Add( weapon is { IsReloading: true } ? ReloadPct( weapon ) : 0 );
 		h.Add( player?.ActiveWeaponSlot );
 
 		if ( ShowScoreboard )

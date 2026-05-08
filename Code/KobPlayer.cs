@@ -1,4 +1,6 @@
 using Sandbox;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public sealed class KobPlayer : Component
@@ -6,6 +8,8 @@ public sealed class KobPlayer : Component
 	[Property] public float WalkSpeed             { get; set; } = 300f;
 	[Property] public float JumpForce             { get; set; } = 500f;
 	[Property] public float SprintSpeedMultiplier { get; set; } = 1.5f;
+
+	[Property] public List<GameObject> StartingWeaponPrefabs { get; set; } = new();
 
 	[Sync] public KobTeam Team             { get; set; } = KobTeam.None;
 	[Sync] public int     Kills            { get; set; }
@@ -17,10 +21,11 @@ public sealed class KobPlayer : Component
 	[Sync] public int     Ping             { get; set; }
 	[Sync] public int     ActiveWeaponSlot { get; set; }
 
-	private PlayerController _playerController;
-	private KobWeapon[]      _weapons = System.Array.Empty<KobWeapon>();
-	private KobHealth        _health;
-	private CameraComponent  _camera;
+	private PlayerController     _playerController;
+	private KobWeapon[]          _weapons = Array.Empty<KobWeapon>();
+	private KobHealth            _health;
+	private CameraComponent      _camera;
+	private SkinnedModelRenderer _bodyRenderer;
 
 	protected override void OnStart()
 	{
@@ -30,12 +35,8 @@ public sealed class KobPlayer : Component
 		_playerController = Components.Get<PlayerController>();
 		_health           = Components.Get<KobHealth>();
 
-		_weapons = Components.GetAll<KobWeapon>()
-			.OrderBy( w => w.WeaponSlot )
-			.ToArray();
-
-		if ( _weapons.Length > 0 )
-			SetActiveSlot( 0 );
+		if ( _health is not null )
+			_health.OnDeath += HandleDeath;
 
 		if ( _playerController is not null )
 		{
@@ -44,6 +45,19 @@ public sealed class KobPlayer : Component
 			_playerController.JumpSpeed        = JumpForce;
 			_playerController.UseInputControls = false;
 		}
+
+		GiveStartingWeapons();
+	}
+
+	protected override void OnDestroy()
+	{
+		if ( _health is not null )
+			_health.OnDeath -= HandleDeath;
+	}
+
+	private void HandleDeath( KobPlayer killer )
+	{
+		DropActiveWeapon();
 	}
 
 	protected override void OnUpdate()
@@ -53,7 +67,11 @@ public sealed class KobPlayer : Component
 		if ( _playerController is null )
 			_playerController = Components.Get<PlayerController>();
 		if ( _health is null )
+		{
 			_health = Components.Get<KobHealth>();
+			if ( _health is not null )
+				_health.OnDeath += HandleDeath;
+		}
 		if ( _camera is null )
 			_camera = Scene.GetAllComponents<CameraComponent>().FirstOrDefault( c => c.Enabled );
 
@@ -65,11 +83,18 @@ public sealed class KobPlayer : Component
 		if ( _playerController is not null )
 			_playerController.UseInputControls = Team != KobTeam.None && !isDead;
 
+		if ( _bodyRenderer is null )
+		{
+			var body = GameObject.Children.FirstOrDefault( c => c.Name == "Body" );
+			_bodyRenderer = body?.Components.Get<SkinnedModelRenderer>();
+		}
+
 		if ( isDead || Team == KobTeam.None ) return;
 
 		HandleWeaponSwitch();
 		HandleFire();
 		HandleReload();
+		UpdateWeaponTransform();
 	}
 
 	private void HandleWeaponSwitch()
@@ -83,27 +108,20 @@ public sealed class KobPlayer : Component
 	{
 		ActiveWeaponSlot = slot;
 		for ( int i = 0; i < _weapons.Length; i++ )
-			_weapons[i].Enabled = i == slot;
-	}
-
-	public void ResetWeaponState()
-	{
-		if ( _weapons.Length > 0 )
-			SetActiveSlot( 0 );
+			_weapons[i].GameObject.Enabled = ( i == slot );
 	}
 
 	private void HandleFire()
 	{
 		if ( _weapons.Length == 0 ) return;
-		int slot   = System.Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
+		int slot   = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
 		var weapon = _weapons[slot];
-		if ( weapon is null || !weapon.Enabled ) return;
+		if ( weapon is null || !weapon.GameObject.Enabled ) return;
 
 		if ( Input.Down( "attack1" ) )
 		{
 			Vector3 origin    = _camera?.WorldPosition    ?? WorldPosition + Vector3.Up * 64f;
 			Vector3 direction = _camera?.WorldRotation.Forward ?? WorldRotation.Forward;
-
 			weapon.FireRequest( origin, direction );
 		}
 	}
@@ -112,7 +130,180 @@ public sealed class KobPlayer : Component
 	{
 		if ( _weapons.Length == 0 ) return;
 		if ( !Input.Pressed( "reload" ) ) return;
-		int slot = System.Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
+		int slot = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
 		_weapons[slot]?.ReloadRequest();
+	}
+
+	// ── Weapon management ──────────────────────────────────────────────────
+
+	private GameObject GetOrCreateWeaponsParent()
+	{
+		var existing = GameObject.Children.FirstOrDefault( c => c.Name == "Weapons" );
+		if ( existing is not null ) return existing;
+		var go = new GameObject( true, "Weapons" );
+		go.SetParent( GameObject );
+		return go;
+	}
+
+	public void GiveStartingWeapons()
+	{
+		if ( IsProxy ) return;
+
+		var parent = GetOrCreateWeaponsParent();
+		foreach ( var child in parent.Children.ToList() )
+			child.Destroy();
+
+		foreach ( var prefab in StartingWeaponPrefabs )
+		{
+			if ( prefab is null ) continue;
+			var weaponGO = prefab.Clone();
+			weaponGO.SetParent( parent );
+			weaponGO.LocalPosition = Vector3.Zero;
+			weaponGO.LocalRotation = Rotation.Identity;
+			weaponGO.Enabled       = false;
+		}
+
+		RefreshWeapons();
+		if ( _weapons.Length > 0 )
+			SetActiveSlot( 0 );
+	}
+
+	private void UpdateWeaponTransform()
+	{
+		if ( _weapons.Length == 0 || _bodyRenderer is null ) return;
+		int slot   = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
+		var weapon = _weapons[slot];
+		if ( weapon is null || !weapon.GameObject.Enabled ) return;
+
+		var attach = _bodyRenderer.GetAttachment( "hold_r" );
+		if ( attach is null ) return;
+
+		weapon.GameObject.WorldPosition = attach.Value.Position;
+		weapon.GameObject.WorldRotation = attach.Value.Rotation;
+	}
+
+	public void DropActiveWeapon()
+	{
+		if ( IsProxy || _weapons.Length == 0 ) return;
+
+		int slot   = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
+		var weapon = _weapons[slot];
+		if ( weapon is null ) return;
+
+		var dropPos = WorldPosition + Vector3.Up * 50f;
+
+		var pickupGO = new GameObject( true, $"Pickup_{weapon.WeaponName}" );
+		pickupGO.WorldPosition = dropPos;
+
+		CopyWeaponToGO( weapon, pickupGO );
+
+		var srcRenderer = weapon.Components.Get<ModelRenderer>();
+		if ( srcRenderer is not null )
+		{
+			var dstRenderer = pickupGO.Components.Create<ModelRenderer>();
+			dstRenderer.Model = srcRenderer.Model;
+		}
+
+		pickupGO.Components.Create<KobWeaponPickup>();
+
+		var rb = pickupGO.Components.Create<Rigidbody>();
+		rb.Velocity = WorldRotation.Forward * 80f + Vector3.Up * 60f;
+		rb.Gravity  = true;
+
+		var col = pickupGO.Components.Create<SphereCollider>();
+		col.Radius    = 40f;
+		col.IsTrigger = true;
+
+		pickupGO.NetworkSpawn();
+
+		weapon.GameObject.Destroy();
+		RefreshWeapons();
+
+		if ( _weapons.Length > 0 )
+			SetActiveSlot( 0 );
+		else
+			ActiveWeaponSlot = 0;
+	}
+
+	public void PickupWeapon( KobWeapon weapon )
+	{
+		if ( IsProxy ) return;
+
+		bool slotTaken = Array.Exists( _weapons, w => w is not null && w.WeaponSlot == weapon.WeaponSlot );
+		if ( slotTaken ) return;
+
+		var parent = GetOrCreateWeaponsParent();
+		var newGO  = new GameObject( true, weapon.WeaponName );
+		newGO.SetParent( parent );
+		newGO.LocalPosition = Vector3.Zero;
+		newGO.LocalRotation = Rotation.Identity;
+		newGO.Enabled       = false;
+
+		CopyWeaponToGO( weapon, newGO );
+
+		var srcRenderer = weapon.Components.Get<ModelRenderer>();
+		if ( srcRenderer is not null )
+		{
+			var dstRenderer = newGO.Components.Create<ModelRenderer>();
+			dstRenderer.Model = srcRenderer.Model;
+		}
+
+		weapon.GameObject.Destroy();
+		RefreshWeapons();
+	}
+
+	private void RefreshWeapons()
+	{
+		_weapons = Components.GetAll<KobWeapon>( FindMode.EverythingInSelfAndDescendants )
+			.OrderBy( w => w.WeaponSlot )
+			.ToArray();
+	}
+
+	private static void CopyWeaponToGO( KobWeapon src, GameObject dst )
+	{
+		KobWeapon dstWeapon;
+
+		if ( src is KobWeaponShotgun sg )
+		{
+			var c = dst.Components.Create<KobWeaponShotgun>();
+			c.PelletCount = sg.PelletCount;
+			c.Range       = sg.Range;
+			c.Spread      = sg.Spread;
+			dstWeapon = c;
+		}
+		else if ( src is KobWeaponHitscan hs )
+		{
+			var c = dst.Components.Create<KobWeaponHitscan>();
+			c.Range  = hs.Range;
+			c.Spread = hs.Spread;
+			dstWeapon = c;
+		}
+		else if ( src is KobWeaponProjectile proj )
+		{
+			var c = dst.Components.Create<KobWeaponProjectile>();
+			c.ProjectileSpeed = proj.ProjectileSpeed;
+			c.SplashRadius    = proj.SplashRadius;
+			dstWeapon = c;
+		}
+		else
+		{
+			dstWeapon = dst.Components.Create<KobWeapon>();
+		}
+
+		dstWeapon.WeaponName   = src.WeaponName;
+		dstWeapon.WeaponSlot   = src.WeaponSlot;
+		dstWeapon.Damage       = src.Damage;
+		dstWeapon.FireRate     = src.FireRate;
+		dstWeapon.AmmoMax      = src.AmmoMax;
+		dstWeapon.AmmoCurrent  = src.AmmoCurrent;
+		dstWeapon.ReloadTime   = src.ReloadTime;
+		dstWeapon.FireSound    = src.FireSound;
+		dstWeapon.ReloadSound  = src.ReloadSound;
+	}
+
+	// Called by KobManager after respawn — delegates to GiveStartingWeapons
+	public void ResetWeaponState()
+	{
+		GiveStartingWeapons();
 	}
 }

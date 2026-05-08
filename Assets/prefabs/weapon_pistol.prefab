@@ -1,0 +1,102 @@
+{
+  "RootObject": {
+    "__guid": "a1000001-0000-0000-0000-000000000001",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "weapon_pistol",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "KobWeaponHitscan",
+        "__guid": "a1000001-0000-0000-0000-000000000002",
+        "__enabled": true,
+        "Flags": 0,
+        "AmmoMax": 12,
+        "Damage": 30,
+        "FireRate": 4,
+        "FireSound": "sounds/m4a1 shot.sound",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Range": 5000,
+        "ReloadSound": "sounds/m4 reload sequence.sound",
+        "ReloadTime": 1.5,
+        "Spread": 0.01,
+        "WeaponName": "Pistolet",
+        "WeaponSlot": 0
+      },
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a1000001-0000-0000-0000-000000000003",
+        "__enabled": true,
+        "Flags": 0,
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "LodOverride": null,
+        "MaterialGroup": "default",
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": "pr/gta5_w_pi_appistol.vmdl",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      }
+    ],
+    "Children": [],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [
+    "drakefruit.m4a1_shot#91284",
+    "drakefruit.rifle_reload#91283",
+    "twinsd.gta5wpiappistol#82619"
+  ],
+  "__version": 2
+}

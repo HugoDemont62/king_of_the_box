@@ -40,7 +40,17 @@ public sealed class KobProjectile : Component
 	private void HandleTrigger( Collider other )
 	{
 		if ( IsProxy ) return;
-		if ( other.GameObject == ShooterObject ) return;
+
+		// Vérifie que le collider touché n'appartient pas au tireur (root ou enfants)
+		if ( ShooterObject is not null )
+		{
+			var go = other.GameObject;
+			while ( go is not null )
+			{
+				if ( go == ShooterObject ) return;
+				go = go.Parent;
+			}
+		}
 
 		var targets = Scene.GetAllComponents<KobHealth>()
 			.Where( h => Vector3.DistanceBetween( h.WorldPosition, WorldPosition ) <= SplashRadius )

@@ -1,6 +1,6 @@
 using Sandbox;
 
-public sealed class KobWeaponHitscan : KobWeapon
+public class KobWeaponHitscan : KobWeapon
 {
 	[Property] public float Range  { get; set; } = 5000f;
 	[Property] public float Spread { get; set; } = 0.02f;
@@ -15,7 +15,7 @@ public sealed class KobWeaponHitscan : KobWeapon
 
 		var tr = Scene.Trace
 			.Ray( new Ray( origin, finalDir ), Range )
-			.IgnoreGameObjectHierarchy( GameObject )
+			.IgnoreGameObjectHierarchy( OwnerPlayer?.GameObject ?? GameObject )
 			.Run();
 
 		if ( !tr.Hit ) return;
@@ -23,7 +23,6 @@ public sealed class KobWeaponHitscan : KobWeapon
 		var health = tr.GameObject?.Components.Get<KobHealth>();
 		if ( health is null ) return;
 
-		var shooter = Components.Get<KobPlayer>();
-		health.TakeDamage( Damage, shooter );
+		health.TakeDamage( Damage, OwnerPlayer );
 	}
 }

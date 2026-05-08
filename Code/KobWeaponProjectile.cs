@@ -14,8 +14,8 @@ public sealed class KobWeaponProjectile : KobWeapon
 		var proj = go.Components.Create<KobProjectile>();
 		proj.Damage        = Damage;
 		proj.SplashRadius  = SplashRadius;
-		proj.Shooter       = Components.Get<KobPlayer>();
-		proj.ShooterObject = GameObject;
+		proj.Shooter       = OwnerPlayer;
+		proj.ShooterObject = OwnerPlayer?.GameObject ?? GameObject;
 
 		var rb = go.Components.Create<Rigidbody>();
 		rb.Velocity = direction * ProjectileSpeed;

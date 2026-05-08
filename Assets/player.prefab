@@ -217,6 +217,16 @@
         "OnComponentStart": null,
         "OnComponentUpdate": null,
         "SprintSpeedMultiplier": 1.5,
+        "StartingWeaponPrefabs": [
+          {
+            "_type": "gameobject",
+            "prefab": "prefabs/weapon_pistol.prefab"
+          },
+          {
+            "_type": "gameobject",
+            "prefab": "prefabs/weapon_smg.prefab"
+          }
+        ],
         "WalkSpeed": 200
       },
       {
@@ -254,25 +264,6 @@
         "OnComponentUpdate": null
       },
       {
-        "__type": "KobWeaponHitscan",
-        "__guid": "182a029e-2eb0-435c-9e49-3cecbb9118d9",
-        "__enabled": true,
-        "Flags": 0,
-        "AmmoMax": 30,
-        "Damage": 25,
-        "FireRate": 5,
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "Range": 5000,
-        "ReloadTime": 2,
-        "Spread": 0.02,
-        "WeaponSlot": 0
-      },
-      {
         "__type": "KobRespawnController",
         "__guid": "11f21366-7d7b-4ec8-aeed-1adfa4d0e7d5",
         "__enabled": true,
@@ -284,25 +275,6 @@
         "OnComponentStart": null,
         "OnComponentUpdate": null,
         "RespawnTime": 5
-      },
-      {
-        "__type": "KobWeaponProjectile",
-        "__guid": "98f132a1-cca0-41fd-9c2c-f013fdfc3163",
-        "__enabled": true,
-        "Flags": 0,
-        "AmmoMax": 30,
-        "Damage": 25,
-        "FireRate": 5,
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "ProjectileSpeed": 1500,
-        "ReloadTime": 2,
-        "SplashRadius": 150,
-        "WeaponSlot": 0
       }
     ],
     "Children": [
@@ -368,6 +340,24 @@
             "UseAnimGraph": true
           }
         ],
+        "Children": []
+      },
+      {
+        "__guid": "d9e0f1a2-b3c4-5678-9def-012345678abc",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Weapons",
+        "Position": "10.5228643,0,32.9328537",
+        "Rotation": "0,0,0,1",
+        "Scale": "2,2,2",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [],
         "Children": []
       },
       {

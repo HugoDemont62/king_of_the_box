@@ -44,9 +44,6 @@ public sealed class KobRespawnController : Component
 
 		if ( _playerController is not null )
 			_playerController.UseInputControls = false;
-
-		foreach ( var weapon in Components.GetAll<KobWeapon>() )
-			weapon.Enabled = false;
 	}
 
 	protected override void OnUpdate()
@@ -77,8 +74,5 @@ public sealed class KobRespawnController : Component
 
 		if ( _playerController is not null )
 			_playerController.UseInputControls = true;
-
-		foreach ( var weapon in Components.GetAll<KobWeapon>() )
-			weapon.Enabled = true;
 	}
 }
