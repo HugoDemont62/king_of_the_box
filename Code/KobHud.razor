@@ -67,6 +67,49 @@
 
 	<div class="kob-crosshair">+</div>
 
+	@if ( Manager?.GameOver == true )
+	{
+		<div class="kob-gameover-overlay">
+			<div class="kob-go-winner" style="color: @WinnerColor();">
+				ÉQUIPE @WinnerLabel() GAGNE !
+			</div>
+			<div class="kob-go-scoreboard">
+				<div class="kob-sb-cols">
+					<span class="col-rank">#</span>
+					<span class="col-player">JOUEUR</span>
+					<span class="col-score">SCORE</span>
+					<span class="col-k">K</span>
+					<span class="col-d">D</span>
+					<span class="col-a">A</span>
+					<span class="col-kd">K/D</span>
+					<span class="col-ping">PING</span>
+				</div>
+				@for ( int i = 0; i < _sortedPlayers.Count; i++ )
+				{
+					var player  = _sortedPlayers[i];
+					var rank    = i + 1;
+					var isLocal = !player.IsProxy;
+					<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
+						<span class="col-rank @(rank == 1 ? "kob-sb-rank-gold" : "")">@("#" + rank)</span>
+						<span class="col-player">
+							<span class="team-badge" style="background-color: @TeamBadgeColor( player.Team );"></span>
+							<span style="color: @ScoreboardTeamColor( player.Team );">@player.PlayerName</span>
+						</span>
+						<span class="col-score">@TotalScore( player )</span>
+						<span class="col-k">@player.Kills</span>
+						<span class="col-d">@player.Deaths</span>
+						<span class="col-a">@player.Assists</span>
+						<span class="col-kd">@KdRatio( player )</span>
+						<span class="col-ping @PingClass( player.Ping )">@(player.Ping)ms</span>
+					</div>
+				}
+			</div>
+			<div class="kob-go-countdown">
+				Nouvelle partie dans @((int)MathF.Ceiling( Manager.ResetCountdown ))s
+			</div>
+		</div>
+	}
+
 	@if ( LocalRespawn != null && LocalRespawn.IsDead )
 	{
 		<div class="kob-death-overlay">
@@ -142,6 +185,22 @@
 	string KdRatio( KobPlayer p )    => ( p.Kills / (float)System.Math.Max( p.Deaths, 1 ) ).ToString( "F2" );
 	string PingClass( int ping )     => ping < 60 ? "ping-green" : ping < 120 ? "ping-orange" : "ping-red";
 
+	string WinnerColor() => ( Manager?.WinnerTeam ?? KobTeam.None ) switch
+	{
+		KobTeam.Red   => "#ff4444",
+		KobTeam.Blue  => "#4488ff",
+		KobTeam.Green => "#44cc44",
+		_             => "white",
+	};
+
+	string WinnerLabel() => ( Manager?.WinnerTeam ?? KobTeam.None ) switch
+	{
+		KobTeam.Red   => "ROUGE",
+		KobTeam.Blue  => "BLEUE",
+		KobTeam.Green => "VERTE",
+		_             => "?",
+	};
+
 	string GetTeamColor() => ( LocalPlayer?.Team ?? KobTeam.None ) switch
 	{
 		KobTeam.Red   => "#ff4444",
@@ -203,8 +262,11 @@
 		h.Add( weapon?.WeaponName );
 		h.Add( weapon is { IsReloading: true } ? ReloadPct( weapon ) : 0 );
 		h.Add( player?.ActiveWeaponSlot );
+		h.Add( Manager?.GameOver );
+		h.Add( Manager?.WinnerTeam );
+		h.Add( (int)MathF.Ceiling( Manager?.ResetCountdown ?? 0f ) );
 
-		if ( ShowScoreboard )
+		if ( ShowScoreboard || Manager?.GameOver == true )
 		{
 			_sortedPlayers = Scene.GetAllComponents<KobPlayer>()
 				.OrderByDescending( p => TotalScore( p ) )

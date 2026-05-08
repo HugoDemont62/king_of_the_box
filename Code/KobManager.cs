@@ -13,9 +13,13 @@ public sealed class KobManager : Component, Component.INetworkListener
 	[Sync] public int ScoreBlue  { get; set; }
 	[Sync] public int ScoreGreen { get; set; }
 
-	[Sync] public int PlayersRed   { get; set; }
-	[Sync] public int PlayersBlue  { get; set; }
-	[Sync] public int PlayersGreen { get; set; }
+	[Sync] public int     PlayersRed     { get; set; }
+	[Sync] public int     PlayersBlue    { get; set; }
+	[Sync] public int     PlayersGreen   { get; set; }
+
+	[Sync] public bool    GameOver       { get; set; }
+	[Sync] public KobTeam WinnerTeam     { get; set; }
+	[Sync] public float   ResetCountdown { get; set; }
 
 	private readonly Dictionary<ulong, GameObject> _players = new();
 
@@ -70,6 +74,13 @@ public sealed class KobManager : Component, Component.INetworkListener
 	{
 		if ( IsProxy ) return;
 		UpdatePlayerCounts();
+
+		if ( GameOver )
+		{
+			ResetCountdown -= Time.Delta;
+			if ( ResetCountdown <= 0f )
+				ResetGame();
+		}
 	}
 
 	private void UpdatePlayerCounts()
@@ -91,9 +102,9 @@ public sealed class KobManager : Component, Component.INetworkListener
 			case KobTeam.Green: ScoreGreen++; break;
 		}
 
-		if ( ScoreRed   >= ScoreToWin ) { EndGame( KobTeam.Red );   return; }
-		if ( ScoreBlue  >= ScoreToWin ) { EndGame( KobTeam.Blue );  return; }
-		if ( ScoreGreen >= ScoreToWin ) { EndGame( KobTeam.Green ); return; }
+		if ( ScoreRed   >= ScoreToWin ) { TriggerGameOver( KobTeam.Red );   return; }
+		if ( ScoreBlue  >= ScoreToWin ) { TriggerGameOver( KobTeam.Blue );  return; }
+		if ( ScoreGreen >= ScoreToWin ) { TriggerGameOver( KobTeam.Green ); return; }
 	}
 
 	public void RespawnPlayer( KobPlayer player )
@@ -115,9 +126,21 @@ public sealed class KobManager : Component, Component.INetworkListener
 		player.ResetWeaponState();
 	}
 
-	[Rpc.Broadcast]
-	void EndGame( KobTeam winner )
+	private void TriggerGameOver( KobTeam winner )
 	{
-		Log.Info( $"🏆 Game over! {winner} team wins! 🏆" );
+		GameOver       = true;
+		WinnerTeam     = winner;
+		ResetCountdown = 10f;
+	}
+
+	private void ResetGame()
+	{
+		ScoreRed   = 0;
+		ScoreBlue  = 0;
+		ScoreGreen = 0;
+		GameOver   = false;
+
+		foreach ( var player in Scene.GetAllComponents<KobPlayer>() )
+			RespawnPlayer( player );
 	}
 }
