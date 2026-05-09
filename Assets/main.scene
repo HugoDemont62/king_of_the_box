@@ -304,14 +304,14 @@
           "__guid": "d818e90c-35f1-472b-a7ee-147882d5d82e",
           "__enabled": true,
           "Flags": 0,
-          "CaptureRadius": 150,
+          "CaptureRadius": 200,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "PointsPerSecond": 20
+          "PointsPerSecond": 1
         },
         {
           "__type": "Sandbox.BoxCollider",

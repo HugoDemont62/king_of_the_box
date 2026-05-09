@@ -74,33 +74,48 @@
 				ÉQUIPE @WinnerLabel() GAGNE !
 			</div>
 			<div class="kob-go-scoreboard">
-				<div class="kob-sb-cols">
-					<span class="col-rank">#</span>
-					<span class="col-player">JOUEUR</span>
-					<span class="col-score">SCORE</span>
-					<span class="col-k">K</span>
-					<span class="col-d">D</span>
-					<span class="col-a">A</span>
-					<span class="col-kd">K/D</span>
-					<span class="col-ping">PING</span>
-				</div>
-				@for ( int i = 0; i < _sortedPlayers.Count; i++ )
+				@foreach ( var entry in TeamGroups() )
 				{
-					var player  = _sortedPlayers[i];
-					var rank    = i + 1;
-					var isLocal = !player.IsProxy;
-					<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
-						<span class="col-rank @(rank == 1 ? "kob-sb-rank-gold" : "")">@("#" + rank)</span>
-						<span class="col-player">
-							<span class="team-badge" style="background-color: @TeamBadgeColor( player.Team );"></span>
-							<span style="color: @ScoreboardTeamColor( player.Team );">@player.PlayerName</span>
-						</span>
-						<span class="col-score">@TotalScore( player )</span>
-						<span class="col-k">@player.Kills</span>
-						<span class="col-d">@player.Deaths</span>
-						<span class="col-a">@player.Assists</span>
-						<span class="col-kd">@KdRatio( player )</span>
-						<span class="col-ping @PingClass( player.Ping )">@(player.Ping)ms</span>
+					bool isWinner = entry.Item1 == Manager.WinnerTeam;
+					<div class="kob-sb-team-block @(isWinner ? "kob-sb-team-winner" : "")">
+						<div class="kob-sb-team-hdr" style="background: @TeamGradient(entry.Item1); border-left-color: @TeamBadgeColor(entry.Item1);">
+							<span class="kob-sb-team-hdr-name">@TeamLabel(entry.Item1)</span>
+							<div class="kob-sb-team-hdr-right">
+								<div class="kob-sb-team-hdr-prog-bg">
+									<div class="kob-sb-team-hdr-prog-fill" style="width: @ScorePct(entry.Item3)%; background: @TeamBadgeColor(entry.Item1);"></div>
+								</div>
+								<span class="kob-sb-team-hdr-score">@entry.Item3 <span class="kob-sb-team-hdr-max">/ @(Manager?.ScoreToWin ?? 200)</span></span>
+							</div>
+						</div>
+						<div class="kob-sb-cols">
+							<span class="col-rank">#</span>
+							<span class="col-player">JOUEUR</span>
+							<span class="col-zone">ZONE</span>
+							<span class="col-k">K</span>
+							<span class="col-d">M</span>
+							<span class="col-a">A</span>
+							<span class="col-kd">K/D</span>
+							<span class="col-ping">PING</span>
+						</div>
+						@if ( entry.Item2.Count == 0 )
+						{
+							<div class="kob-sb-empty">Aucun joueur</div>
+						}
+						@foreach ( var player in entry.Item2 )
+						{
+							int  globalRank = _sortedPlayers.IndexOf( player ) + 1;
+							bool isLocal    = !player.IsProxy;
+							<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
+								<span class="col-rank @(globalRank == 1 ? "kob-sb-rank-gold" : "")">@("#" + globalRank)</span>
+								<span class="col-player" style="color: @ScoreboardTeamColor(player.Team);">@player.PlayerName</span>
+								<span class="col-zone" style="color: @TeamBadgeColor(player.Team);">@player.ZonePoints</span>
+								<span class="col-k">@player.Kills</span>
+								<span class="col-d">@player.Deaths</span>
+								<span class="col-a">@player.Assists</span>
+								<span class="col-kd">@KdRatio(player)</span>
+								<span class="col-ping @PingClass(player.Ping)">@(player.Ping)ms</span>
+							</div>
+						}
 					</div>
 				}
 			</div>
@@ -122,44 +137,48 @@
 	@if ( ShowScoreboard )
 	{
 		<div class="kob-scoreboard">
-			<div class="kob-sb-header">
-				<div class="kob-sb-title">KING OF THE BOX — SCORES</div>
-				<div class="kob-sb-team-scores">
-					@if ( Manager != null )
-					{
-						<span class="kob-sb-team-score" style="color: #ff4444;">🔴 @Manager.ScoreRed</span>
-						<span class="kob-sb-team-score" style="color: #4488ff;">🔵 @Manager.ScoreBlue</span>
-						<span class="kob-sb-team-score" style="color: #44cc44;">🟢 @Manager.ScoreGreen</span>
-					}
-				</div>
-			</div>
-			<div class="kob-sb-cols">
-				<span class="col-rank">#</span>
-				<span class="col-player">JOUEUR</span>
-				<span class="col-score">SCORE</span>
-				<span class="col-k">K</span>
-				<span class="col-d">D</span>
-				<span class="col-a">A</span>
-				<span class="col-kd">K/D</span>
-				<span class="col-ping">PING</span>
-			</div>
-			@for ( int i = 0; i < _sortedPlayers.Count; i++ )
+			<div class="kob-sb-title-bar">KING OF THE BOX</div>
+			@foreach ( var entry in TeamGroups() )
 			{
-				var player  = _sortedPlayers[i];
-				var rank    = i + 1;
-				var isLocal = !player.IsProxy;
-				<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
-					<span class="col-rank @(rank == 1 ? "kob-sb-rank-gold" : "")">@("#" + rank)</span>
-					<span class="col-player">
-						<span class="team-badge" style="background-color: @TeamBadgeColor( player.Team );"></span>
-						<span style="color: @ScoreboardTeamColor( player.Team );">@player.PlayerName</span>
-					</span>
-					<span class="col-score">@TotalScore( player )</span>
-					<span class="col-k">@player.Kills</span>
-					<span class="col-d">@player.Deaths</span>
-					<span class="col-a">@player.Assists</span>
-					<span class="col-kd">@KdRatio( player )</span>
-					<span class="col-ping @PingClass( player.Ping )">@(player.Ping)ms</span>
+				<div class="kob-sb-team-block">
+					<div class="kob-sb-team-hdr" style="background: @TeamGradient(entry.Item1); border-left-color: @TeamBadgeColor(entry.Item1);">
+						<span class="kob-sb-team-hdr-name">@TeamLabel(entry.Item1)</span>
+						<div class="kob-sb-team-hdr-right">
+							<div class="kob-sb-team-hdr-prog-bg">
+								<div class="kob-sb-team-hdr-prog-fill" style="width: @ScorePct(entry.Item3)%; background: @TeamBadgeColor(entry.Item1);"></div>
+							</div>
+							<span class="kob-sb-team-hdr-score">@entry.Item3 <span class="kob-sb-team-hdr-max">/ @(Manager?.ScoreToWin ?? 200)</span></span>
+						</div>
+					</div>
+					<div class="kob-sb-cols">
+						<span class="col-rank">#</span>
+						<span class="col-player">JOUEUR</span>
+						<span class="col-zone">ZONE</span>
+						<span class="col-k">K</span>
+						<span class="col-d">M</span>
+						<span class="col-a">A</span>
+						<span class="col-kd">K/D</span>
+						<span class="col-ping">PING</span>
+					</div>
+					@if ( entry.Item2.Count == 0 )
+					{
+						<div class="kob-sb-empty">Aucun joueur</div>
+					}
+					@foreach ( var player in entry.Item2 )
+					{
+						int  globalRank = _sortedPlayers.IndexOf( player ) + 1;
+						bool isLocal    = !player.IsProxy;
+						<div class="kob-sb-row @(isLocal ? "kob-sb-row-local" : "")">
+							<span class="col-rank @(globalRank == 1 ? "kob-sb-rank-gold" : "")">@("#" + globalRank)</span>
+							<span class="col-player" style="color: @ScoreboardTeamColor(player.Team);">@player.PlayerName</span>
+							<span class="col-zone" style="color: @TeamBadgeColor(player.Team);">@player.ZonePoints</span>
+							<span class="col-k">@player.Kills</span>
+							<span class="col-d">@player.Deaths</span>
+							<span class="col-a">@player.Assists</span>
+							<span class="col-kd">@KdRatio(player)</span>
+							<span class="col-ping @PingClass(player.Ping)">@(player.Ping)ms</span>
+						</div>
+					}
 				</div>
 			}
 		</div>
@@ -175,8 +194,11 @@
 	                                         .OrderBy( w => w.WeaponSlot )
 	                                         .ElementAtOrDefault( LocalPlayer.ActiveWeaponSlot );
 
-	bool ShowScoreboard { get; set; }
+	bool            ShowScoreboard { get; set; }
 	List<KobPlayer> _sortedPlayers = new();
+	List<KobPlayer> _redPlayers    = new();
+	List<KobPlayer> _bluePlayers   = new();
+	List<KobPlayer> _greenPlayers  = new();
 
 	int ReloadPct( KobWeapon w ) =>
 		(int)( MathF.Min( 1f, MathF.Max( 0f, ( Time.Now - w.ReloadStartTime ) / w.ReloadTime ) ) * 100f );
@@ -184,6 +206,30 @@
 	int    TotalScore( KobPlayer p ) => p.Kills + p.Assists + p.ZonePoints;
 	string KdRatio( KobPlayer p )    => ( p.Kills / (float)System.Math.Max( p.Deaths, 1 ) ).ToString( "F2" );
 	string PingClass( int ping )     => ping < 60 ? "ping-green" : ping < 120 ? "ping-orange" : "ping-red";
+	int    ScorePct( int score )     => System.Math.Min( score * 100 / System.Math.Max( Manager?.ScoreToWin ?? 200, 1 ), 100 );
+
+	(KobTeam, List<KobPlayer>, int)[] TeamGroups() => new[]
+	{
+		(KobTeam.Red,   _redPlayers,   Manager?.ScoreRed   ?? 0),
+		(KobTeam.Blue,  _bluePlayers,  Manager?.ScoreBlue  ?? 0),
+		(KobTeam.Green, _greenPlayers, Manager?.ScoreGreen ?? 0),
+	};
+
+	string TeamLabel( KobTeam team ) => team switch
+	{
+		KobTeam.Red   => "ÉQUIPE ROUGE",
+		KobTeam.Blue  => "ÉQUIPE BLEUE",
+		KobTeam.Green => "ÉQUIPE VERTE",
+		_             => "SANS ÉQUIPE",
+	};
+
+	string TeamGradient( KobTeam team ) => team switch
+	{
+		KobTeam.Red   => "linear-gradient(90deg, rgba(200,40,40,0.35) 0%, rgba(0,0,0,0) 100%)",
+		KobTeam.Blue  => "linear-gradient(90deg, rgba(40,80,210,0.35) 0%, rgba(0,0,0,0) 100%)",
+		KobTeam.Green => "linear-gradient(90deg, rgba(40,170,40,0.35) 0%, rgba(0,0,0,0) 100%)",
+		_             => "none",
+	};
 
 	string WinnerColor() => ( Manager?.WinnerTeam ?? KobTeam.None ) switch
 	{
@@ -268,10 +314,11 @@
 
 		if ( ShowScoreboard || Manager?.GameOver == true )
 		{
-			_sortedPlayers = Scene.GetAllComponents<KobPlayer>()
-				.OrderByDescending( p => TotalScore( p ) )
-				.ThenByDescending( p => p.Kills )
-				.ToList();
+			var all    = Scene.GetAllComponents<KobPlayer>().ToList();
+			_sortedPlayers = all.OrderByDescending( p => TotalScore( p ) ).ThenByDescending( p => p.Kills ).ToList();
+			_redPlayers    = all.Where( p => p.Team == KobTeam.Red   ).OrderByDescending( p => TotalScore( p ) ).ToList();
+			_bluePlayers   = all.Where( p => p.Team == KobTeam.Blue  ).OrderByDescending( p => TotalScore( p ) ).ToList();
+			_greenPlayers  = all.Where( p => p.Team == KobTeam.Green ).OrderByDescending( p => TotalScore( p ) ).ToList();
 
 			foreach ( var p in _sortedPlayers )
 			{

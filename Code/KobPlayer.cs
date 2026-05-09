@@ -64,6 +64,10 @@ public sealed class KobPlayer : Component
 	{
 		if ( IsProxy ) return;
 
+		if ( _playerController is not null && !_playerController.IsValid() ) _playerController = null;
+		if ( _health          is not null && !_health.IsValid()           ) { _health = null; }
+		if ( _bodyRenderer    is not null && !_bodyRenderer.IsValid()     ) _bodyRenderer = null;
+
 		if ( _playerController is null )
 			_playerController = Components.Get<PlayerController>();
 		if ( _health is null )
@@ -116,7 +120,7 @@ public sealed class KobPlayer : Component
 		if ( _weapons.Length == 0 ) return;
 		int slot   = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
 		var weapon = _weapons[slot];
-		if ( weapon is null || !weapon.GameObject.Enabled ) return;
+		if ( weapon is null || !weapon.IsValid() || !weapon.GameObject.Enabled ) return;
 
 		if ( Input.Down( "attack1" ) )
 		{
@@ -173,7 +177,7 @@ public sealed class KobPlayer : Component
 		if ( _weapons.Length == 0 || _bodyRenderer is null ) return;
 		int slot   = Math.Clamp( ActiveWeaponSlot, 0, _weapons.Length - 1 );
 		var weapon = _weapons[slot];
-		if ( weapon is null || !weapon.GameObject.Enabled ) return;
+		if ( weapon is null || !weapon.IsValid() || !weapon.GameObject.Enabled ) return;
 
 		var attach = _bodyRenderer.GetAttachment( "hold_r" );
 		if ( attach is null ) return;
@@ -255,6 +259,7 @@ public sealed class KobPlayer : Component
 	private void RefreshWeapons()
 	{
 		_weapons = Components.GetAll<KobWeapon>( FindMode.EverythingInSelfAndDescendants )
+			.Where( w => w.IsValid() )
 			.OrderBy( w => w.WeaponSlot )
 			.ToArray();
 	}
