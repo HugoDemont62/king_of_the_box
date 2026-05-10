@@ -510,6 +510,86 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "65aacc24-48de-49fa-8f27-87d1d9883a62",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "EnvironmentSpawner",
+      "Position": "-3988.75244,-1289.88672,1552.04211",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "KobEnvironmentSpawner",
+          "__guid": "460d391b-1e72-4d0a-bc6c-98e21547d7c0",
+          "__enabled": true,
+          "Flags": 0,
+          "Categories": [
+            {
+              "Model": "models/sbox_props/shrubs/pine/pine_bush_regular_c.vmdl",
+              "Count": 5000,
+              "MinScale": 0.5,
+              "MaxScale": 2,
+              "RandomRotationY": true,
+              "IsUrban": false
+            },
+            {
+              "Model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+              "Count": 100,
+              "MinScale": 0.8,
+              "MaxScale": 1.2,
+              "RandomRotationY": true,
+              "IsUrban": false
+            },
+            {
+              "Model": "models/forest/house_2.vmdl",
+              "Count": 25,
+              "MinScale": 1,
+              "MaxScale": 1,
+              "RandomRotationY": true,
+              "IsUrban": true
+            },
+            {
+              "Model": "models/forest/house_3.vmdl",
+              "Count": 50,
+              "MinScale": 1,
+              "MaxScale": 1,
+              "RandomRotationY": true,
+              "IsUrban": true
+            },
+            {
+              "Model": "models/rock.vmdl",
+              "Count": 5000,
+              "MinScale": 0.1,
+              "MaxScale": 1.2,
+              "RandomRotationY": true,
+              "IsUrban": false
+            }
+          ],
+          "CityCount": 3,
+          "CityFlatVarianceMax": 0.0005,
+          "CityRadius": 2500,
+          "MaxSlopeVariance": 0.003,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RoadSegmentLength": 400,
+          "RoadSegmentModel": "models/road/road.vmdl",
+          "WallThickness": 200
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -532,11 +612,6 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
-        }
-      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
@@ -550,6 +625,13 @@
   "ResourceVersion": 3,
   "Title": null,
   "Description": null,
-  "__references": [],
+  "__references": [
+    "ambi.house_2#50788",
+    "ambi.house_3#50898",
+    "facepunch.pine_bush_regular_c#145436",
+    "facepunch.tree_oak_medium_a#145473",
+    "jammie.tile_road#55704",
+    "pundalf.rock#12115"
+  ],
   "__version": 3
 }

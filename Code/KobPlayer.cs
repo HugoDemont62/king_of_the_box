@@ -11,7 +11,6 @@ public sealed class KobPlayer : Component
 
 	[Property] public List<GameObject> StartingWeaponPrefabs { get; set; } = new();
 
-	[Property] public float CameraOrbitSpeed  { get; set; } = 80f;
 	[Property] public float WeaponForwardBias { get; set; } = 0f;
 
 	[Sync] public KobTeam Team             { get; set; } = KobTeam.None;
@@ -108,25 +107,11 @@ public sealed class KobPlayer : Component
 			return;
 		}
 
-		HandleCameraOrbit();
 		UpdateHoldType();
 		HandleWeaponSwitch();
 		HandleFire();
 		HandleReload();
 		UpdateWeaponTransform();
-	}
-
-	private void HandleCameraOrbit()
-	{
-		if ( _playerController is null ) return;
-
-		float delta = 0f;
-		if ( Input.Down( "left"  ) ) delta -= CameraOrbitSpeed * Time.Delta;
-		if ( Input.Down( "right" ) ) delta += CameraOrbitSpeed * Time.Delta;
-		if ( delta == 0f ) return;
-
-		var angles = _playerController.EyeAngles;
-		_playerController.EyeAngles = angles.WithYaw( angles.yaw + delta );
 	}
 
 	private void UpdateHoldType()

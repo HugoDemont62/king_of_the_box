@@ -13,6 +13,8 @@ public sealed class KobTerrainGenerator : Component
 	private int      _seed;
 	private ushort[] _heights;
 
+	public static event Action<int, ushort[], int, Terrain> OnTerrainReady;
+
 	protected override void OnStart()
 	{
 		if ( Networking.IsHost )
@@ -30,6 +32,8 @@ public sealed class KobTerrainGenerator : Component
 		// 2) Maintenant que le collider est à jour on peut raycaster sur le terrain
 		RepositionSpawnPoints();
 		RepositionWaypoints();
+
+		OnTerrainReady?.Invoke( _seed, _heights, _res, _terrain );
 	}
 
 	[Rpc.Broadcast]
