@@ -95,7 +95,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "GameManager",
-      "Position": "0,0,100",
+      "Position": "-1788.13867,-815.56958,100",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "",
@@ -164,6 +164,20 @@
           "ScaleStrategy": "ConsistentHeight",
           "TargetCamera": null,
           "ZIndex": 100
+        },
+        {
+          "__type": "KobTerrainGenerator",
+          "__guid": "d15653bb-ac74-4cda-9471-7d1b2d8237e0",
+          "__enabled": true,
+          "Flags": 0,
+          "HeightMultiplier": 0.3,
+          "NoiseScale": 0.001,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
@@ -190,7 +204,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "SpawnPoint_Red",
-          "Position": "-1.6496582,-368.63681,0",
+          "Position": "4417.70801,3484.54834,0",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "",
@@ -518,17 +532,17 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
         }
       },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "a4747aaa-e6cc-4dcb-bcab-8da1918fc242"
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
         }
       }
     }

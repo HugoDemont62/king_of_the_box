@@ -20,6 +20,15 @@ public sealed class KobZoneMover : Component
 		TimeUntilMove = MoveInterval;
 	}
 
+	public void ResetToFirstWaypoint()
+	{
+		if ( Waypoints.Count == 0 ) return;
+		_waypointIndex = 0;
+		_moving        = false;
+		TimeUntilMove  = MoveInterval;
+		WorldPosition  = Waypoints[0].WorldPosition;
+	}
+
 	protected override void OnFixedUpdate()
 	{
 		if ( IsProxy || Waypoints.Count == 0 ) return;
