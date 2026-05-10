@@ -24,6 +24,8 @@
         "Damage": 30,
         "FireRate": 4,
         "FireSound": "sounds/m4a1 shot.sound",
+        "HoldAngles": "0,0,0",
+        "HoldOffset": "0,0,0",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -61,7 +63,7 @@
           "BloomLayer": false,
           "AfterUILayer": false
         },
-        "RenderType": "On",
+        "RenderType": "Off",
         "Tint": "1,1,1,1"
       }
     ],

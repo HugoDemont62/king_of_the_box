@@ -67,6 +67,37 @@
 
 	<div class="kob-crosshair">+</div>
 
+	@* Minimap *@
+	@if ( LocalPlayer != null && LocalPlayer.Team != KobTeam.None )
+	{
+		<div class="kob-minimap">
+			@if ( MmZone != null )
+			{
+				var (zx, zy) = ToMinimap( MmZone.WorldPosition );
+				<div class="kob-mm-zone" style="left: @zx%; top: @zy%; background: @MmZoneColor();"></div>
+			}
+			@foreach ( var p in Scene.GetAllComponents<KobPlayer>() )
+			{
+				bool isLocal = !p.IsProxy;
+				bool isAlly  = p.Team == LocalPlayer.Team && !isLocal;
+				if ( !isLocal && !isAlly && !MmRecentlyFired( p ) ) continue;
+				var (px, py) = ToMinimap( p.WorldPosition );
+				if ( isLocal )
+				{
+					<div class="kob-mm-self" style="left: @px%; top: @py%; transform: translate(-50%,-50%) rotate(@MmSelfYaw()deg);"></div>
+				}
+				else if ( isAlly )
+				{
+					<div class="kob-mm-ally" style="left: @px%; top: @py%; background: @MmTeamColor( p.Team );"></div>
+				}
+				else
+				{
+					<div class="kob-mm-enemy" style="left: @px%; top: @py%; background: @MmTeamColor( p.Team );"></div>
+				}
+			}
+		</div>
+	}
+
 	@if ( Manager?.GameOver == true )
 	{
 		<div class="kob-gameover-overlay">
@@ -194,6 +225,49 @@
 	                                         .OrderBy( w => w.WeaponSlot )
 	                                         .ElementAtOrDefault( LocalPlayer.ActiveWeaponSlot );
 
+	// ── Minimap ───────────────────────────────────────────────────────────────
+	KobCaptureZone MmZone    => Scene.GetAllComponents<KobCaptureZone>().FirstOrDefault();
+	Terrain        _mmTerrain;
+
+	Terrain MmGetTerrain()
+	{
+		if ( _mmTerrain is null || !_mmTerrain.IsValid() )
+			_mmTerrain = Scene.GetAllComponents<Terrain>().FirstOrDefault();
+		return _mmTerrain;
+	}
+
+	(float x, float y) ToMinimap( Vector3 world )
+	{
+		var t = MmGetTerrain();
+		if ( t is null ) return (50f, 50f);
+		float x = ( world.x - t.WorldPosition.x ) / t.TerrainSize * 100f;
+		float y = ( world.y - t.WorldPosition.y ) / t.TerrainSize * 100f;
+		return ( System.Math.Clamp( x, 1f, 99f ), System.Math.Clamp( y, 1f, 99f ) );
+	}
+
+	float MmSelfYaw() => LocalPlayer?.Components.Get<PlayerController>()?.EyeAngles.yaw ?? 0f;
+
+	bool MmRecentlyFired( KobPlayer p ) =>
+		p.Components.GetAll<KobWeapon>( FindMode.EverythingInSelfAndDescendants )
+		 .Any( w => w.LastFireTime > 0f && Time.Now - w.LastFireTime < 3f );
+
+	string MmZoneColor() => ( MmZone?.ControllingTeam ?? KobTeam.None ) switch
+	{
+		KobTeam.Red   => "#ff4444",
+		KobTeam.Blue  => "#4488ff",
+		KobTeam.Green => "#44cc44",
+		_             => MmZone?.IsContested == true ? "#ffcc00" : "#cccccc",
+	};
+
+	string MmTeamColor( KobTeam team ) => team switch
+	{
+		KobTeam.Red   => "#ff4444",
+		KobTeam.Blue  => "#4488ff",
+		KobTeam.Green => "#44cc44",
+		_             => "#cccccc",
+	};
+
+	// ── Scoreboard ────────────────────────────────────────────────────────────
 	bool            ShowScoreboard { get; set; }
 	List<KobPlayer> _sortedPlayers = new();
 	List<KobPlayer> _redPlayers    = new();
@@ -311,6 +385,21 @@
 		h.Add( Manager?.GameOver );
 		h.Add( Manager?.WinnerTeam );
 		h.Add( (int)MathF.Ceiling( Manager?.ResetCountdown ?? 0f ) );
+
+		// Minimap
+		h.Add( (int)( MmZone?.WorldPosition.x ?? 0f ) );
+		h.Add( (int)( MmZone?.WorldPosition.y ?? 0f ) );
+		h.Add( MmZone?.ControllingTeam );
+		h.Add( MmZone?.IsContested );
+		h.Add( (int)( MmSelfYaw() / 5f ) );
+		foreach ( var p in Scene.GetAllComponents<KobPlayer>() )
+		{
+			bool isLocal = !p.IsProxy;
+			bool isAlly  = p.Team == player?.Team && !isLocal;
+			if ( !isLocal && !isAlly && !MmRecentlyFired( p ) ) continue;
+			h.Add( (int)p.WorldPosition.x );
+			h.Add( (int)p.WorldPosition.y );
+		}
 
 		if ( ShowScoreboard || Manager?.GameOver == true )
 		{

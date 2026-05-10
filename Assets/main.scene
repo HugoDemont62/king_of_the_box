@@ -171,7 +171,7 @@
           "__enabled": true,
           "Flags": 0,
           "HeightMultiplier": 0.3,
-          "NoiseScale": 0.001,
+          "NoiseScale": 0.0003,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,

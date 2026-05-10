@@ -11,9 +11,13 @@ public class KobWeapon : Component
 	[Property] public SoundEvent  FireSound    { get; set; }
 	[Property] public SoundEvent  ReloadSound  { get; set; }
 
+	[Property] public Vector3 HoldOffset { get; set; } = Vector3.Zero;
+	[Property] public Angles  HoldAngles { get; set; } = new Angles( 0f, 0f, 0f );
+
 	[Sync] public int   AmmoCurrent     { get; set; }
 	[Sync] public bool  IsReloading     { get; set; }
 	[Sync] public float ReloadStartTime { get; set; }
+	[Sync] public float LastFireTime    { get; set; }
 
 	private float _nextFireTime;
 	private float _reloadEndTime;
@@ -43,6 +47,7 @@ public class KobWeapon : Component
 
 		AmmoCurrent--;
 		_nextFireTime = Time.Now + 1f / FireRate;
+		LastFireTime  = Time.Now;
 		DoFire( origin, direction );
 		BroadcastFireSound( origin );
 
