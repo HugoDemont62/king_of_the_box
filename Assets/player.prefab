@@ -227,7 +227,8 @@
             "prefab": "prefabs/weapon_smg.prefab"
           }
         ],
-        "WalkSpeed": 200
+        "WalkSpeed": 200,
+        "WeaponForwardBias": 0
       },
       {
         "__type": "Sandbox.CharacterController",
@@ -275,6 +276,18 @@
         "OnComponentStart": null,
         "OnComponentUpdate": null,
         "RespawnTime": 5
+      },
+      {
+        "__type": "KobAchievementTracker",
+        "__guid": "35848df7-4be3-4b66-a869-5551e93d618a",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
       }
     ],
     "Children": [
