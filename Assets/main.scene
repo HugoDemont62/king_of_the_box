@@ -318,7 +318,7 @@
           "__guid": "d818e90c-35f1-472b-a7ee-147882d5d82e",
           "__enabled": true,
           "Flags": 0,
-          "CaptureRadius": 200,
+          "CaptureRadius": 500,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -612,18 +612,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
       },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "74725e29-5d05-490a-bf5c-bde568338847"
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

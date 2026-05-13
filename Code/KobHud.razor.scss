@@ -19,6 +19,20 @@ root {
 	overflow: hidden;
 }
 
+.kob-mm-north {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 900;
+    color: rgba(255, 220, 100, 0.9);
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+
 .kob-mm-zone {
 	position: absolute;
 	width: 20px;
@@ -422,6 +436,71 @@ root {
 .ping-orange { color: #ffaa44; }
 .ping-red    { color: #ff5555; }
 
+/* ── Azimut / Boussole ── */
+.kob-azimuth-bar {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.kob-azimuth-track {
+    position: relative;
+    width: 400px;
+    height: 28px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+}
+
+.kob-azimuth-point {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.kob-azimuth-cardinal {
+    font-size: 14px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 0 8px rgba(255, 230, 100, 0.35);
+}
+
+.kob-azimuth-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    margin-top: 1px;
+}
+
+.kob-azimuth-pointer {
+    font-size: 9px;
+    color: rgba(255, 200, 100, 0.9);
+    line-height: 1;
+}
+
+.kob-azimuth-degrees {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 200, 100, 0.9);
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    line-height: 1.2;
+}
+
 /* ── Crosshair ── */
 .kob-crosshair {
 	position: absolute;
@@ -441,7 +520,7 @@ root {
 .kob-weapon-panel {
 	position: absolute;
 	bottom: 24px;
-	right: 120px;
+	right: 220px;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
@@ -605,4 +684,122 @@ root {
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Grande Carte Tactique ── */
+.kob-large-map-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 150;
+    animation: kob-map-fade 0.18s ease-out;
+}
+
+@keyframes kob-map-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.kob-lm-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.kob-lm-area {
+    position: relative;
+    width: 700px;
+    height: 700px;
+    background: rgba(18, 30, 18, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+    background-image:
+        repeating-linear-gradient(rgba(255,255,255,0.025) 0px, transparent 1px, transparent 69px, rgba(255,255,255,0.025) 70px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0px, transparent 1px, transparent 69px, rgba(255,255,255,0.025) 70px);
+}
+
+.kob-lm-cardinal {
+    position: absolute;
+    font-size: 15px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.kob-lm-n { top: 6px;    left: 50%;  transform: translateX(-50%); }
+.kob-lm-s { bottom: 6px; left: 50%;  transform: translateX(-50%); }
+.kob-lm-e { right: 8px;  top: 50%;   transform: translateY(-50%); }
+.kob-lm-o { left: 8px;   top: 50%;   transform: translateY(-50%); }
+
+.kob-lm-city {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 200, 80, 0.1);
+    border: 1px dashed rgba(255, 200, 80, 0.45);
+    transform: translate(-50%, -50%);
+}
+
+.kob-lm-city-name {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 220, 100, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+.kob-lm-zone {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid white;
+    background: transparent;
+}
+
+.kob-lm-self-arrow {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    clip-path: polygon(50% 0%, 15% 100%, 85% 100%);
+    z-index: 5;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+.kob-lm-player-dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    z-index: 4;
+}
+
+.kob-lm-hint {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
 }

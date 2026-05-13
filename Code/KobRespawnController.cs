@@ -10,13 +10,15 @@ public sealed class KobRespawnController : Component
 	[Sync] public float  RespawnTimer { get; set; }
 	[Sync] public string KillerName   { get; set; } = "";
 
-	private KobHealth        _health;
-	private PlayerController _playerController;
+	private KobHealth           _health;
+	private PlayerController    _playerController;
+	private CharacterController _characterController;
 
 	protected override void OnStart()
 	{
-		_health           = Components.Get<KobHealth>();
-		_playerController = Components.Get<PlayerController>();
+		_health               = Components.Get<KobHealth>();
+		_playerController     = Components.Get<PlayerController>();
+		_characterController  = Components.Get<CharacterController>();
 
 		if ( _health is not null )
 		{
@@ -71,6 +73,9 @@ public sealed class KobRespawnController : Component
 		IsDead       = false;
 		RespawnTimer = 0f;
 		KillerName   = "";
+
+		if ( _characterController is not null )
+			_characterController.Velocity = Vector3.Zero;
 
 		if ( _playerController is not null )
 			_playerController.UseInputControls = true;

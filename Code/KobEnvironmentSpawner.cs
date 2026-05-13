@@ -13,6 +13,13 @@ public sealed class KobEnvironmentSpawner : Component
 	[Property] public Model RoadSegmentModel    { get; set; }
 	[Property] public float RoadSegmentLength   { get; set; } = 400f;
 
+	private static readonly string[] CityNamePool = {
+		"Montval", "Ferrière", "Clamont", "Belvaux", "Rochamp",
+		"Saintour", "Graville", "Vessin", "Ourcelin", "Dampart"
+	};
+
+	public static List<(Vector3 pos, string name)> CityCenters { get; private set; } = new();
+
 	private readonly List<GameObject> _decorations = new();
 	private List<Vector3> _cityCenters = new();
 	private ushort[]                  _heights;
@@ -82,6 +89,7 @@ public sealed class KobEnvironmentSpawner : Component
 			go.Destroy();
 		_decorations.Clear();
 		_cityCenters.Clear();
+		CityCenters = new List<(Vector3, string)>();
 
 		if ( _terrain is null || _heights is null || Categories.Count == 0 ) return;
 
@@ -94,6 +102,10 @@ public sealed class KobEnvironmentSpawner : Component
 		var cityRng = new System.Random( seed ^ 0x3C17_A000 );
 		_cityCenters = FindCityCenters( cityRng, tX, tY, tZ, tSize, tHeight );
 		Log.Info( $"[KobEnv] {_cityCenters.Count} centre(s) de ville trouvé(s)." );
+
+		for ( int i = 0; i < _cityCenters.Count; i++ )
+			CityCenters.Add( (_cityCenters[i], CityNamePool[i % CityNamePool.Length]) );
+		Log.Info( $"[KobEnv] {CityCenters.Count} ville(s) nommée(s) enregistrée(s)." );
 
 		int categorySeed = seed ^ 0x7DEC_0001;
 

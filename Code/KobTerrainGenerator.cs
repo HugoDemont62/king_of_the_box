@@ -146,7 +146,7 @@ public sealed class KobTerrainGenerator : Component
 			var tr  = Scene.Trace.Ray( ray, tHeight + 1000f ).Run();
 
 			if ( tr.Hit )
-				return tr.HitPosition + Vector3.Up * 10f; // 10 units au-dessus du sol
+				return tr.HitPosition + Vector3.Up * 80f;
 		}
 
 		return null;

@@ -65,12 +65,33 @@
 		}
 	}
 
+	@* Azimut *@
+	@if ( LocalPlayer != null && LocalPlayer.Team != KobTeam.None && !(LocalHealth?.IsDead ?? false) )
+	{
+		<div class="kob-azimuth-bar">
+			<div class="kob-azimuth-track">
+				@foreach ( var cp in _compassPoints )
+				{
+					float offsetPx = CompassOffsetPx( cp.angle );
+					if ( MathF.Abs( offsetPx ) > 210f ) continue;
+					<div class="kob-azimuth-point @(cp.label.Length == 1 ? "kob-azimuth-cardinal" : "")"
+					     style="left: @(200f + offsetPx)px;">@cp.label</div>
+				}
+			</div>
+			<div class="kob-azimuth-bottom">
+				<div class="kob-azimuth-pointer">▲</div>
+				<div class="kob-azimuth-degrees">@((int)CompassHeading())°</div>
+			</div>
+		</div>
+	}
+
 	<div class="kob-crosshair">+</div>
 
 	@* Minimap *@
 	@if ( LocalPlayer != null && LocalPlayer.Team != KobTeam.None )
 	{
 		<div class="kob-minimap">
+			<div class="kob-mm-north">N</div>
 			@if ( MmZone != null )
 			{
 				var (zx, zy) = ToMinimap( MmZone.WorldPosition );
@@ -95,6 +116,54 @@
 					<div class="kob-mm-enemy" style="left: @px%; top: @py%; background: @MmTeamColor( p.Team );"></div>
 				}
 			}
+		</div>
+	}
+
+	@* Grande Carte *@
+	@if ( ShowLargeMap && LocalPlayer != null && LocalPlayer.Team != KobTeam.None )
+	{
+		<div class="kob-large-map-overlay">
+			<div class="kob-lm-title">CARTE TACTIQUE</div>
+			<div class="kob-lm-area">
+				<div class="kob-lm-cardinal kob-lm-n">N</div>
+				<div class="kob-lm-cardinal kob-lm-s">S</div>
+				<div class="kob-lm-cardinal kob-lm-e">E</div>
+				<div class="kob-lm-cardinal kob-lm-o">O</div>
+
+				@foreach ( var city in KobEnvironmentSpawner.CityCenters )
+				{
+					var (cx, cy) = ToMinimap( city.pos );
+					<div class="kob-lm-city" style="left: @cx%; top: @cy%;">
+						<span class="kob-lm-city-name">@city.name</span>
+					</div>
+				}
+
+				@if ( MmZone != null )
+				{
+					var (zx, zy) = ToMinimap( MmZone.WorldPosition );
+					float diam   = LmZoneDiamPct();
+					<div class="kob-lm-zone"
+					     style="left: @zx%; top: @zy%; width: @diam%; height: @diam%; border-color: @MmZoneColor(); box-shadow: 0 0 14px @MmZoneColor();"></div>
+				}
+
+				@foreach ( var p in Scene.GetAllComponents<KobPlayer>() )
+				{
+					if ( p.Team == KobTeam.None ) continue;
+					var (px, py) = ToMinimap( p.WorldPosition );
+					bool isLocal = !p.IsProxy;
+					if ( isLocal )
+					{
+						<div class="kob-lm-self-arrow"
+						     style="left: @px%; top: @py%; transform: translate(-50%,-50%) rotate(@MmSelfYaw()deg);"></div>
+					}
+					else
+					{
+						<div class="kob-lm-player-dot"
+						     style="left: @px%; top: @py%; background: @MmTeamColor( p.Team );"></div>
+					}
+				}
+			</div>
+			<div class="kob-lm-hint">[ M ] Fermer</div>
 		</div>
 	}
 
@@ -267,8 +336,39 @@
 		_             => "#cccccc",
 	};
 
+	// ── Azimut / Boussole ─────────────────────────────────────────────────────
+	readonly (float angle, string label)[] _compassPoints =
+	{
+		(0f, "N"), (45f, "NE"), (90f, "E"), (135f, "SE"),
+		(180f, "S"), (225f, "SO"), (270f, "O"), (315f, "NO"),
+	};
+
+	float CompassHeading()
+	{
+		// yaw 0 = Est en s&box (axe +X), yaw croît vers la gauche (CCW depuis le haut)
+		// heading 0 = Nord, 90 = Est, 180 = Sud, 270 = Ouest
+		float yaw = MmSelfYaw();
+		return ((90f - yaw) % 360f + 360f) % 360f;
+	}
+
+	float CompassOffsetPx(float pointAngle)
+	{
+		float heading = CompassHeading();
+		float diff = ((pointAngle - heading + 180f + 360f) % 360f) - 180f;
+		return diff * (400f / 120f); // 400px de large, 120° visibles
+	}
+
 	// ── Scoreboard ────────────────────────────────────────────────────────────
 	bool            ShowScoreboard { get; set; }
+	bool            ShowLargeMap   { get; set; }
+
+	float LmZoneDiamPct()
+	{
+		var t = MmGetTerrain();
+		if ( t is null || MmZone is null ) return 0f;
+		return MmZone.CaptureRadius * 2f / t.TerrainSize * 100f;
+	}
+
 	List<KobPlayer> _sortedPlayers = new();
 	List<KobPlayer> _redPlayers    = new();
 	List<KobPlayer> _bluePlayers   = new();
@@ -347,10 +447,18 @@
 
 	protected override void OnUpdate()
 	{
-		var show = Input.Down( "score" );
-		if ( ShowScoreboard == show ) return;
-		ShowScoreboard = show;
-		StateHasChanged();
+		var showScore = Input.Down( "score" );
+		if ( ShowScoreboard != showScore )
+		{
+			ShowScoreboard = showScore;
+			StateHasChanged();
+		}
+
+		if ( Input.Pressed( "map" ) )
+		{
+			ShowLargeMap = !ShowLargeMap;
+			StateHasChanged();
+		}
 	}
 
 	protected override int BuildHash()
@@ -386,13 +494,16 @@
 		h.Add( Manager?.WinnerTeam );
 		h.Add( (int)MathF.Ceiling( Manager?.ResetCountdown ?? 0f ) );
 
+		// Cache player list once for all loops in BuildHash
+		var allPlayers = Scene.GetAllComponents<KobPlayer>().ToList();
+
 		// Minimap
 		h.Add( (int)( MmZone?.WorldPosition.x ?? 0f ) );
 		h.Add( (int)( MmZone?.WorldPosition.y ?? 0f ) );
 		h.Add( MmZone?.ControllingTeam );
 		h.Add( MmZone?.IsContested );
-		h.Add( (int)( MmSelfYaw() / 5f ) );
-		foreach ( var p in Scene.GetAllComponents<KobPlayer>() )
+		h.Add( (int)( MmSelfYaw() / 2f ) ); // granularité 2° pour l'azimut
+		foreach ( var p in allPlayers )
 		{
 			bool isLocal = !p.IsProxy;
 			bool isAlly  = p.Team == player?.Team && !isLocal;
@@ -403,7 +514,7 @@
 
 		if ( ShowScoreboard || Manager?.GameOver == true )
 		{
-			var all    = Scene.GetAllComponents<KobPlayer>().ToList();
+			var all    = allPlayers;
 			_sortedPlayers = all.OrderByDescending( p => TotalScore( p ) ).ThenByDescending( p => p.Kills ).ToList();
 			_redPlayers    = all.Where( p => p.Team == KobTeam.Red   ).OrderByDescending( p => TotalScore( p ) ).ToList();
 			_bluePlayers   = all.Where( p => p.Team == KobTeam.Blue  ).OrderByDescending( p => TotalScore( p ) ).ToList();
@@ -420,6 +531,19 @@
 				h.Add( p.Team );
 				h.Add( p.PlayerName );
 			}
+		}
+
+		h.Add( ShowLargeMap );
+		if ( ShowLargeMap )
+		{
+			foreach ( var p in allPlayers )
+			{
+				if ( p.Team == KobTeam.None ) continue;
+				h.Add( (int)p.WorldPosition.x );
+				h.Add( (int)p.WorldPosition.y );
+				h.Add( p.Team );
+			}
+			h.Add( KobEnvironmentSpawner.CityCenters.Count );
 		}
 
 		return h.ToHashCode();
